@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports -- jest.isolateModules needs a fresh require() of the module per scenario. */
 describe('dev auth bypass', () => {
     const original = process.env.EXPO_PUBLIC_DEV_AUTH_BYPASS;
     afterEach(() => {
