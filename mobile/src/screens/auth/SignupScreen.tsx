@@ -203,8 +203,8 @@ export default function SignupScreen() {
                     <Animated.View 
                         style={[styles.bottomPanel, panelStyle, { minHeight: height - headerHeight, paddingBottom: insets.bottom }]}
                     >
-                        <Text style={styles.panelTitle}>NEW ACCOUNT</Text>
-                        <Text style={styles.panelSubtitle}>START YOUR JOURNEY</Text>
+                        <Text style={styles.panelTitle}>New account</Text>
+                        <Text style={styles.panelSubtitle}>Start your journey</Text>
 
                         <View style={styles.formContainer}>
 
@@ -214,7 +214,7 @@ export default function SignupScreen() {
                                     <TextInput
                                         style={styles.input}
                                         placeholder="Full Name"
-                                        placeholderTextColor="#90A4AE"
+                                        placeholderTextColor={Colors.textMuted}
                                         value={name}
                                         onChangeText={v => { setName(v); if (touched.name) validate('name', v); }}
                                         onBlur={() => touchField('name', name)}
@@ -233,7 +233,7 @@ export default function SignupScreen() {
                                         ref={emailRef}
                                         style={styles.input}
                                         placeholder="Email Address"
-                                        placeholderTextColor="#90A4AE"
+                                        placeholderTextColor={Colors.textMuted}
                                         value={email}
                                         onChangeText={v => { setEmail(v); if (touched.email) validate('email', v); }}
                                         onBlur={() => touchField('email', email)}
@@ -255,7 +255,7 @@ export default function SignupScreen() {
                                         ref={passwordRef}
                                         style={[styles.input, { flex: 1 }]}
                                         placeholder="Password"
-                                        placeholderTextColor="#90A4AE"
+                                        placeholderTextColor={Colors.textMuted}
                                         value={password}
                                         onChangeText={v => { setPassword(v); if (touched.password) validate('password', v); }}
                                         onBlur={() => touchField('password', password)}
@@ -265,7 +265,7 @@ export default function SignupScreen() {
                                         onSubmitEditing={() => confirmRef.current?.focus()}
                                     />
                                     <TouchableOpacity onPress={() => setShowPassword(p => !p)} style={styles.eyeButton}>
-                                        <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={22} color="#90A4AE" />
+                                        <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={22} color={Colors.textMuted} />
                                     </TouchableOpacity>
                                 </View>
 
@@ -273,7 +273,7 @@ export default function SignupScreen() {
                                     <View style={styles.strengthContainer}>
                                         <View style={styles.strengthBars}>
                                             {([1, 2, 3, 4] as StrengthLevel[]).map(level => (
-                                                <View key={level} style={[styles.strengthBar, { backgroundColor: strength >= level ? STRENGTH_COLOR[strength] : '#E0E6ED' }]} />
+                                                <View key={level} style={[styles.strengthBar, { backgroundColor: strength >= level ? STRENGTH_COLOR[strength] : Colors.border }]} />
                                             ))}
                                         </View>
                                         {strength > 0 && (
@@ -301,7 +301,7 @@ export default function SignupScreen() {
                                         ref={confirmRef}
                                         style={[styles.input, { flex: 1 }]}
                                         placeholder="Confirm Password"
-                                        placeholderTextColor="#90A4AE"
+                                        placeholderTextColor={Colors.textMuted}
                                         value={confirmPassword}
                                         onChangeText={v => { setConfirmPassword(v); if (touched.confirm) validate('confirm', v, password); }}
                                         onBlur={() => touchField('confirm', confirmPassword, password)}
@@ -311,11 +311,11 @@ export default function SignupScreen() {
                                         onSubmitEditing={handleSignup}
                                     />
                                     <TouchableOpacity onPress={() => setShowConfirm(p => !p)} style={styles.eyeButton}>
-                                        <Ionicons name={showConfirm ? 'eye-off-outline' : 'eye-outline'} size={22} color="#90A4AE" />
+                                        <Ionicons name={showConfirm ? 'eye-off-outline' : 'eye-outline'} size={22} color={Colors.textMuted} />
                                     </TouchableOpacity>
                                 </View>
                                 {confirmPassword.length > 0 && (
-                                    <Text style={[styles.matchText, { color: confirmPassword === password ? '#2E7D32' : '#EF5350' }]}>
+                                    <Text style={[styles.matchText, { color: confirmPassword === password ? Colors.primary : Colors.error }]}>
                                         {confirmPassword === password ? '✓ Passwords match' : '✗ Passwords do not match'}
                                     </Text>
                                 )}
@@ -328,14 +328,14 @@ export default function SignupScreen() {
                                 disabled={loading}
                             >
                                 {loading ? (
-                                    <ActivityIndicator color="#FFFFFF" size="small" />
+                                    <ActivityIndicator color={Colors.white} size="small" />
                                 ) : (
-                                    <Text style={styles.signupButtonText}>SIGN UP</Text>
+                                    <Text style={styles.signupButtonText}>Sign up</Text>
                                 )}
                             </TouchableOpacity>
 
                             <TouchableOpacity onPress={() => navigation.navigate('Login')} style={styles.switchButton}>
-                                <Text style={styles.switchText}>ALREADY HAVE AN ACCOUNT?</Text>
+                                <Text style={styles.switchText}>Already have an account?</Text>
                             </TouchableOpacity>
                         </View>
 
@@ -362,8 +362,8 @@ export default function SignupScreen() {
 function Requirement({ met, label }: { met: boolean; label: string }) {
     return (
         <View style={reqStyles.row}>
-            <Text style={[reqStyles.dot, { color: met ? '#2E7D32' : '#90A4AE' }]}>{met ? '✓' : '○'}</Text>
-            <Text style={[reqStyles.label, { color: met ? '#2E7D32' : '#90A4AE' }]}>{label}</Text>
+            <Text style={[reqStyles.dot, { color: met ? Colors.primary : Colors.textMuted }]}>{met ? '✓' : '○'}</Text>
+            <Text style={[reqStyles.label, { color: met ? Colors.primary : Colors.textMuted }]}>{label}</Text>
         </View>
     );
 }
@@ -376,7 +376,7 @@ const reqStyles = StyleSheet.create({
 
 // Styles
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#F6F8F9' },
+    container: { flex: 1, backgroundColor: Colors.background },
     keyboardView: { flex: 1 },
     fixedHeader: {
         position: 'absolute',
@@ -389,7 +389,7 @@ const styles = StyleSheet.create({
     scrollContent: { flexGrow: 1, alignItems: 'center' },
     illustrationContainer: { alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
     bottomPanel: {
-        backgroundColor: '#E3F2FD',
+        backgroundColor: Colors.surfaceMuted,
         width: '100%',
         borderTopLeftRadius: 40,
         borderTopRightRadius: 40,
@@ -397,24 +397,24 @@ const styles = StyleSheet.create({
         paddingBottom: 0,   // extra space for wave
         paddingHorizontal: 24,
         alignItems: 'center',
-        shadowColor: '#000',
+        shadowColor: Colors.shadow,
         shadowOffset: { width: 0, height: -2 },
         shadowOpacity: 0.05,
         shadowRadius: 5,
         elevation: 10,
         overflow: 'hidden',   // clip wave inside panel
     },
-    panelTitle: { fontSize: 13, fontWeight: '600', color: '#636E72', letterSpacing: 2, marginBottom: 2 },
-    panelSubtitle: { fontSize: 17, fontWeight: 'bold', color: '#2D3436', letterSpacing: 1, marginBottom: 10 },
+    panelTitle: { fontSize: 13, fontWeight: '600', color: Colors.textSecondary, letterSpacing: 0.2, marginBottom: 2 },
+    panelSubtitle: { fontSize: 17, fontWeight: 'bold', color: Colors.textPrimary, letterSpacing: 0.2, marginBottom: 10 },
     formContainer: { width: '100%', gap: 8 },
     inputWrapper: {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: Colors.white,
         borderRadius: 30,
         paddingHorizontal: 20,
         paddingVertical: 10,
         flexDirection: 'row',
         alignItems: 'center',
-        shadowColor: '#000',
+        shadowColor: Colors.shadow,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 3,
@@ -422,10 +422,10 @@ const styles = StyleSheet.create({
         borderWidth: 1.5,
         borderColor: 'transparent',
     },
-    inputError: { borderColor: '#EF5350' },
-    input: { flex: 1, fontSize: 16, color: '#2D3436' },
+    inputError: { borderColor: Colors.error },
+    input: { flex: 1, fontSize: 16, color: Colors.textPrimary },
     eyeButton: { paddingLeft: 8 },
-    errorText: { color: '#EF5350', fontSize: 11, marginTop: 3, marginLeft: 16 },
+    errorText: { color: Colors.error, fontSize: 11, marginTop: 3, marginLeft: 16 },
     matchText: { fontSize: 11, marginTop: 3, marginLeft: 16, fontWeight: '500' },
     strengthContainer: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6, paddingHorizontal: 4 },
     strengthBars: { flexDirection: 'row', gap: 4, flex: 1 },
@@ -433,11 +433,11 @@ const styles = StyleSheet.create({
     strengthLabel: { fontSize: 11, fontWeight: '700', width: 50, textAlign: 'right' },
     requirementsList: { paddingHorizontal: 4, marginTop: 4, gap: 1 },
     signupButton: {
-        backgroundColor: '#95C27E',
+        backgroundColor: Colors.primary,
         borderRadius: 30,
         paddingVertical: 14,
         alignItems: 'center',
-        shadowColor: '#95C27E',
+        shadowColor: Colors.primarySoft,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 5,
@@ -445,7 +445,7 @@ const styles = StyleSheet.create({
         marginTop: 6,
     },
     signupButtonDisabled: { opacity: 0.7 },
-    signupButtonText: { color: '#FFFFFF', fontWeight: 'bold', fontSize: 16, letterSpacing: 1 },
+    signupButtonText: { color: Colors.white, fontWeight: 'bold', fontSize: 16, letterSpacing: 0.2 },
     switchButton: { paddingVertical: 12, alignItems: 'center' },
-    switchText: { color: Colors.primary, fontWeight: 'bold', fontSize: 12, letterSpacing: 1, textDecorationLine: 'underline' },
+    switchText: { color: Colors.primary, fontWeight: 'bold', fontSize: 12, letterSpacing: 0.2, textDecorationLine: 'underline' },
 });

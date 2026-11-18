@@ -1,4 +1,5 @@
 import React from 'react';
+import { Colors } from '../constants/colors';
 import Svg, { Defs, RadialGradient, Stop, Rect } from 'react-native-svg';
 
 interface Props {
@@ -7,11 +8,11 @@ interface Props {
     color?: string;
 }
 
-export const LeavesDecoration = ({ width = 400, height = 400, color = '#7EA889' }: Props) => {
+export const LeavesDecoration = ({ width = 400, height = 400, color = Colors.primarySoft }: Props) => {
     // Calming ambient color palette tokens
     const softSage = color; // primary sage color
-    const softAmber = '#FDF4E5'; // soft sunlight
-    const softMint = '#E6FAF6';  // soft mint water
+    const softAmber = Colors.accentTint; // soft sunlight
+    const softMint = Colors.primaryWash; // soft mint water
 
     // preserveAspectRatio="none": the 400x400 viewBox is square but callers can pass a
     // non-square width/height (e.g. CompleteTaskScreen's width*0.8 height) — without this

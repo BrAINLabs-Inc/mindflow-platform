@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Dimensions, Animated, Image } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Dimensions, Animated } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -19,16 +19,23 @@ import { PopupModal } from '../components/PopupModal';
 import { LogoBlock } from '../components/LogoBlock';
 import { PanelWave } from '../components/PanelWave';
 import { RoadmapBgDecor } from '../components/RoadmapBgDecor';
+import { CalmScene } from '../components/CalmScene';
+import { Radius, Typography } from '../constants/theme';
+import { cardShadow } from '../styles/shared';
 
 
 const { width } = Dimensions.get('window');
 
-const EgGroupImage = require('../../assets/exGroup.png') as number;
-const CgGroupImage = require('../../assets/cgGroup.png') as number;
+// Experimental-group accent (sage); the control group uses the warm accent instead.
+const EG_ACCENT = Colors.primary;
 
-const EG_BLUE = '#466FB5';       
-const EG_BLUE_DARK = '#214081'; 
-const EG_BLUE_LIGHT = '#C4D2EC'; 
+// Time-of-day greeting in the device's local time.
+function greetingFor(date: Date): string {
+    const h = date.getHours();
+    if (h < 12) return 'Good morning';
+    if (h < 17) return 'Good afternoon';
+    return 'Good evening';
+}
 
 type DashboardNavProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -40,7 +47,7 @@ function ProgressRing({ size = 88, strokeWidth = 9, progress, color }: { size?: 
     const offset = circumference * (1 - Math.min(Math.max(progress, 0), 1));
     return (
         <Svg width={size} height={size}>
-            <Circle cx={size / 2} cy={size / 2} r={radius} stroke="#EEF1EF" strokeWidth={strokeWidth} fill="none" />
+            <Circle cx={size / 2} cy={size / 2} r={radius} stroke={Colors.primaryTint} strokeWidth={strokeWidth} fill="none" />
             <Circle
                 cx={size / 2} cy={size / 2} r={radius}
                 stroke={color} strokeWidth={strokeWidth} fill="none"
@@ -52,19 +59,6 @@ function ProgressRing({ size = 88, strokeWidth = 9, progress, color }: { size?: 
                 originY={size / 2}
             />
         </Svg>
-    );
-}
-
-// Group illustration: a plain themed image per research arm, no decoration around it.
-function BreathingIllustration({ isControlGroup }: { isControlGroup: boolean }) {
-    return (
-        <View style={styles.illustrationContainer}>
-            <Image
-                source={isControlGroup ? CgGroupImage : EgGroupImage}
-                style={styles.groupIllustrationImage}
-                resizeMode="contain"
-            />
-        </View>
     );
 }
 
@@ -156,11 +150,11 @@ const QuoteFactCard = memo(function QuoteFactCard({ isControlGroup }: { isContro
                 <Ionicons
                     name={isControlGroup ? 'bulb-outline' : 'sparkles-outline'}
                     size={15}
-                    color={isControlGroup ? '#D97706' : EG_BLUE}
+                    color={isControlGroup ? Colors.accent : EG_ACCENT}
                 />
                 <Text style={[
                     styles.quoteLabelText,
-                    { color: isControlGroup ? '#B45309' : EG_BLUE_DARK }
+                    { color: isControlGroup ? Colors.accent : EG_ACCENT }
                 ]}>
                     {isControlGroup ? 'Daily Fun Fact' : "Today's Inspiration"}
                 </Text>
@@ -171,7 +165,7 @@ const QuoteFactCard = memo(function QuoteFactCard({ isControlGroup }: { isContro
                 </Text>
                 <Text style={[
                     styles.quoteAuthor,
-                    { color: isControlGroup ? '#B45309' : EG_BLUE_DARK }
+                    { color: isControlGroup ? Colors.accent : EG_ACCENT }
                 ]}>
                     — {isControlGroup ? currentFact.author : currentQuote.author}
                 </Text>
@@ -182,11 +176,11 @@ const QuoteFactCard = memo(function QuoteFactCard({ isControlGroup }: { isContro
 
 // Roadmap steps configuration
 const JOURNEY_STEPS = [
-    { id: 1, title: 'Daily Sliders', subtitle: 'Daily check-in (Resets 12 AM)', route: 'DailySliders', Icon: JourneyIcons.Sun, color: '#D97706', bgColor: '#FFFBEB', statusKey: 'daily' },
-    { id: 2, title: 'Weekly Whispers', subtitle: 'Weekly voice journal (Once a week)', route: 'WeeklyWhispers', Icon: JourneyIcons.Microphone, color: '#6366F1', bgColor: '#EEF2FF', statusKey: 'weekly' },
-    { id: 3, title: 'Thrive Tracker', subtitle: 'Wellbeing tracker (Last 2 weeks)', route: 'ThriveTracker', Icon: JourneyIcons.Chart, color: '#749F82', bgColor: '#E6F4EA', statusKey: 'thrive' },
-    { id: 4, title: 'Stress Snapshot', subtitle: 'Perceived stress (Last 1 month)', route: 'StressSnapshot', Icon: JourneyIcons.StressCamera, color: '#E07A5F', bgColor: '#FFF4F2', statusKey: 'stress' },
-    { id: 5, title: 'Mindful Mirror', subtitle: 'Mindfulness check (Last 1 month)', route: 'MindfulMirror', Icon: JourneyIcons.Mirror, color: '#0D9488', bgColor: '#F0FDFA', statusKey: 'mindful' },
+    { id: 1, title: 'Daily Sliders', subtitle: 'Daily check-in (Resets 12 AM)', route: 'DailySliders', Icon: JourneyIcons.Sun, color: Colors.tasks.daily.ink, bgColor: Colors.tasks.daily.tint, statusKey: 'daily' },
+    { id: 2, title: 'Weekly Whispers', subtitle: 'Weekly voice journal (Once a week)', route: 'WeeklyWhispers', Icon: JourneyIcons.Microphone, color: Colors.tasks.weekly.ink, bgColor: Colors.tasks.weekly.tint, statusKey: 'weekly' },
+    { id: 3, title: 'Thrive Tracker', subtitle: 'Wellbeing tracker (Last 2 weeks)', route: 'ThriveTracker', Icon: JourneyIcons.Chart, color: Colors.tasks.thrive.ink, bgColor: Colors.tasks.thrive.tint, statusKey: 'thrive' },
+    { id: 4, title: 'Stress Snapshot', subtitle: 'Perceived stress (Last 1 month)', route: 'StressSnapshot', Icon: JourneyIcons.StressCamera, color: Colors.tasks.stress.ink, bgColor: Colors.tasks.stress.tint, statusKey: 'stress' },
+    { id: 5, title: 'Mindful Mirror', subtitle: 'Mindfulness check (Last 1 month)', route: 'MindfulMirror', Icon: JourneyIcons.Mirror, color: Colors.tasks.mindful.ink, bgColor: Colors.tasks.mindful.tint, statusKey: 'mindful' },
 ];
 
 interface RoadmapNodeProps {
@@ -292,7 +286,7 @@ const RoadmapNode = memo(({
                         borderWidth: 0,
                     } : {
                         backgroundColor: locked ? Colors.surfaceMuted : bgColor,
-                        borderColor: locked ? '#CBD5E1' : color
+                        borderColor: locked ? Colors.border : color
                     }
                 ]}>
                     {completed ? (
@@ -582,19 +576,23 @@ export default function DashboardScreen() {
                     { opacity: mountFade, paddingTop: insets.top > 0 ? insets.top + 5 : 24 }
                 ]}
             >
-                <LogoBlock />
+                <View style={styles.topBar}>
+                    <LogoBlock compact />
+                </View>
 
-                {/* Centered Hero Illustration & Greeting */}
+                {/* Greeting + calm scene */}
                 <View style={styles.greetingHeaderBlock}>
-                    <BreathingIllustration isControlGroup={isControlGroup} />
-                    <Text style={styles.greetingText}>Hello, {userName}</Text>
+                    <Text style={styles.greetingText}>{greetingFor(new Date())}, {userName}</Text>
                     <Text style={styles.questionText}>
                         {isUnassigned
-                            ? <>Welcome to{'\n'}MindFlow</>
+                            ? 'Welcome to MindFlow'
                             : isControlGroup
-                                ? <>What would you{'\n'}like to do today?</>
-                                : <>Ready for your{'\n'}mindful moment?</>}
+                                ? 'What would you like to do today?'
+                                : 'Ready for your mindful moment?'}
                     </Text>
+                    <View style={styles.sceneWrap}>
+                        <CalmScene width={width - 40} height={132} tone={isControlGroup ? 'warm' : 'sage'} />
+                    </View>
                 </View>
             </Animated.View>
 
@@ -612,22 +610,19 @@ export default function DashboardScreen() {
                 <View style={styles.roadmapWrap}>
                     <View style={[
                         styles.roadmapPanel,
-                        { backgroundColor: isControlGroup ? '#FFF8EC' : '#E3F2FD', paddingBottom: tabBarHeight + 24 }
+                        { paddingBottom: tabBarHeight + 24 }
                     ]}>
                         <Text style={[
                             styles.panelLabel,
-                            { color: isControlGroup ? '#92400E' : '#636E72' }
-                        ]}>{isControlGroup ? 'YOUR ACTIVITIES' : 'YOUR JOURNEY'}</Text>
-                        <Text style={[
-                            styles.panelHeading,
-                            { color: isControlGroup ? '#2D3436' : '#2D3436' }
-                        ]}>{isControlGroup ? 'WEEKLY CHECK-INS' : 'MINDFULNESS ROADMAP'}</Text>
+                            { color: isControlGroup ? Colors.accent : Colors.primarySoft }
+                        ]}>{isControlGroup ? 'Your activities' : 'Your journey'}</Text>
+                        <Text style={styles.panelHeading}>{isControlGroup ? 'Weekly check-ins' : 'Mindfulness roadmap'}</Text>
 
                         {/* Pending-assignment banner */}
                         {isUnassigned && (
                             <View style={styles.pendingBanner}>
                                 <View style={styles.pendingIconCircle}>
-                                    <Ionicons name="time-outline" size={22} color="#D97706" />
+                                    <Ionicons name="time-outline" size={22} color={Colors.accent} />
                                 </View>
                                 <View style={styles.pendingBannerBody}>
                                     <Text style={styles.pendingBannerTitle}>Waiting for Group Assignment</Text>
@@ -639,7 +634,7 @@ export default function DashboardScreen() {
                                         onPress={() => navigation.navigate('AboutMe')}
                                         activeOpacity={0.75}
                                     >
-                                        <Ionicons name="document-text-outline" size={14} color="#D97706" />
+                                        <Ionicons name="document-text-outline" size={14} color={Colors.accent} />
                                         <Text style={styles.pendingAboutMeBtnText}>Complete About Me Profile</Text>
                                     </TouchableOpacity>
                                 </View>
@@ -650,16 +645,9 @@ export default function DashboardScreen() {
                         {!isUnassigned && <QuoteFactCard isControlGroup={isControlGroup} />}
 
                         {/* Progress Hero */}
-                        <View style={[
-                            styles.progressHero,
-                            {
-                                backgroundColor: '#FFFFFF',
-                                borderColor: isControlGroup ? '#FDE68A' : '#C4D2EC',
-                                borderWidth: 1,
-                            }
-                        ]}>
+                        <View style={styles.progressHero}>
                             <View style={styles.progressRingWrap}>
-                                <ProgressRing progress={journeyProgress} color={isControlGroup ? '#D97706' : EG_BLUE} />
+                                <ProgressRing progress={journeyProgress} color={isControlGroup ? Colors.accent : EG_ACCENT} />
                                 <View style={styles.progressRingCenter}>
                                     <Text style={styles.progressRingValue}>{completedCount}/{JOURNEY_STEPS.length}</Text>
                                 </View>
@@ -694,11 +682,8 @@ export default function DashboardScreen() {
                             >
                                 <Defs>
                                     <SvgLinearGradient id="pathGrad" x1="0" y1="0" x2="0" y2="1">
-                                        <Stop offset="0" stopColor="#D97706" stopOpacity="0.8" />
-                                        <Stop offset="0.25" stopColor="#6366F1" stopOpacity="0.8" />
-                                        <Stop offset="0.5" stopColor="#749F82" stopOpacity="0.8" />
-                                        <Stop offset="0.75" stopColor="#E07A5F" stopOpacity="0.8" />
-                                        <Stop offset="1" stopColor="#0D9488" stopOpacity="0.8" />
+                                        <Stop offset="0" stopColor={Colors.primarySoft} stopOpacity="0.7" />
+                                        <Stop offset="1" stopColor={Colors.primaryLight} stopOpacity="0.7" />
                                     </SvgLinearGradient>
                                 </Defs>
                                 <Path
@@ -746,15 +731,14 @@ export default function DashboardScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F6F8F9',
+        backgroundColor: Colors.background,
     },
     fixedTop: {
         position: 'absolute',
         top: 0,
         left: 0,
         right: 0,
-        alignItems: 'center',
-        paddingHorizontal: 24,
+        paddingHorizontal: 20,
         zIndex: 0,
     },
     journeyScroll: {
@@ -765,93 +749,59 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     greetingHeaderBlock: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: 12,
-        marginBottom: 8,
+        marginTop: 18,
+        marginBottom: 20,
     },
     greetingText: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: Colors.iconMuted,
-        letterSpacing: 0.8,
-        marginTop: 10,
-        marginBottom: 4,
-        textAlign: 'center',
+        ...Typography.body,
+        color: Colors.textSecondary,
+        marginBottom: 2,
     },
     questionText: {
-        fontSize: 22,
-        fontWeight: '800',
-        color: '#2D3436',
-        lineHeight: 30,
-        letterSpacing: -0.4,
-        textAlign: 'center',
-        marginBottom: 40,
+        ...Typography.title,
+        marginBottom: 16,
     },
-    illustrationContainer: {
-        width: 180,
-        height: 180,
-        justifyContent: 'center',
+    topBar: {
+        flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between',
     },
-    groupIllustrationImage: {
-        // Fill the 180x180 container instead of a fixed pixel size — the old fixed
-        // 508x198 was ~3x wider than its own container regardless of device, and
-        // overflowed further on narrow phones. resizeMode="contain" (set on the
-        // Image itself) keeps the aspect ratio correct within the box.
-        width: '150%',
-        height: '150%',
+    sceneWrap: {
+        borderRadius: Radius.xl,
+        overflow: 'hidden',
     },
     roadmapWrap: {
         width: '100%',
     },
     roadmapPanel: {
         width: '100%',
-        borderTopLeftRadius: 40,
-        borderTopRightRadius: 40,
+        backgroundColor: Colors.surfaceMuted,
+        borderTopLeftRadius: 32,
+        borderTopRightRadius: 32,
         paddingTop: 28,
         // paddingBottom is set dynamically at the usage site via useTabBarHeight(),
         // so the last roadmap node always clears the floating tab bar.
-        paddingHorizontal: 24,
+        paddingHorizontal: 20,
         overflow: 'hidden',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: -2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 5,
-        elevation: 10,
     },
     panelLabel: {
-        fontSize: 13,
-        fontWeight: '600',
-        color: '#636E72',
-        letterSpacing: 2,
+        ...Typography.eyebrow,
         marginBottom: 2,
     },
     panelHeading: {
-        fontSize: 17,
-        fontWeight: 'bold',
-        color: '#2D3436',
-        letterSpacing: 1,
+        ...Typography.heading,
         marginBottom: 16,
     },
     quoteCard: {
-        borderRadius: 16,
+        borderRadius: Radius.lg,
         padding: 18,
-        marginBottom: 16,
-        borderWidth: 1,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.03,
-        shadowRadius: 6,
-        elevation: 1,
+        marginBottom: 12,
     },
     quoteCardEx: {
-        backgroundColor: '#FAFBFE',
-        borderColor: EG_BLUE_LIGHT,
+        backgroundColor: Colors.primaryTint,
     },
     quoteCardControl: {
-        backgroundColor: '#FCFAF6',
-        borderColor: '#F7EAD0',
+        backgroundColor: Colors.accentTint,
     },
     quoteHeader: {
         flexDirection: 'row',
@@ -860,36 +810,31 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     quoteLabelText: {
-        fontSize: 12,
-        fontWeight: '700',
-        letterSpacing: 0.3,
+        fontSize: 13,
+        fontWeight: '600',
     },
     quoteBody: {
         marginTop: 2,
     },
     quoteText: {
-        fontSize: 14,
-        lineHeight: 22,
-        color: '#374151',
-        fontStyle: 'italic',
+        fontSize: 15,
+        lineHeight: 23,
+        color: Colors.textPrimary,
         marginBottom: 8,
     },
     quoteAuthor: {
-        fontSize: 12,
-        fontWeight: '600',
+        fontSize: 13,
+        fontWeight: '500',
     },
     progressHero: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 16,
-        borderRadius: 20,
+        backgroundColor: Colors.surface,
+        borderRadius: Radius.lg,
         padding: 16,
         marginBottom: 24,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.02,
-        shadowRadius: 6,
-        elevation: 1,
+        ...cardShadow,
     },
     progressRingWrap: {
         width: 88,
@@ -903,23 +848,20 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     progressRingValue: {
-        fontSize: 16,
-        fontWeight: '800',
-        color: '#1F2937',
+        fontSize: 17,
+        fontWeight: '700',
+        color: Colors.textPrimary,
     },
     progressHeroBody: {
         flex: 1,
     },
     progressHeroTitle: {
-        fontSize: 15,
-        fontWeight: '700',
-        color: '#1F2937',
-        marginBottom: 3,
+        ...Typography.subheading,
+        marginBottom: 2,
     },
     progressHeroSubtitle: {
-        fontSize: 12,
-        color: Colors.iconMuted,
-        lineHeight: 17,
+        ...Typography.caption,
+        color: Colors.textSecondary,
     },
     mapContainer: {
         position: 'relative',
@@ -963,12 +905,8 @@ const styles = StyleSheet.create({
         borderRadius: 28,
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 3,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 4,
+        borderWidth: 2,
+        ...cardShadow,
         backgroundColor: Colors.surface,
     },
     nodeCircleCompleted: {
@@ -1003,15 +941,11 @@ const styles = StyleSheet.create({
     },
     nodeLabel: {
         backgroundColor: Colors.surface,
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-        borderRadius: 12,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
-        shadowRadius: 4,
-        elevation: 2,
-        minWidth: 120,
+        paddingHorizontal: 14,
+        paddingVertical: 9,
+        borderRadius: Radius.md,
+        ...cardShadow,
+        minWidth: 128,
     },
     nodeLabelCompleted: {
         borderWidth: 1,
@@ -1019,10 +953,8 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.primaryTint,
     },
     nodeLabelLocked: {
-        backgroundColor: '#F8FAFC',
-        borderColor: Colors.borderLight,
-        borderWidth: 1,
-        opacity: 0.7,
+        backgroundColor: Colors.surface,
+        opacity: 0.75,
     },
     nodeLabelActive: {
         borderColor: Colors.primary,
@@ -1034,25 +966,25 @@ const styles = StyleSheet.create({
         elevation: 3,
     },
     nodeLabelText: {
-        fontSize: 13,
-        fontWeight: '700',
+        fontSize: 14,
+        fontWeight: '600',
     },
     nodeSubtext: {
-        fontSize: 10,
+        fontSize: 11,
         color: Colors.textMuted,
         marginTop: 2,
     },
     pendingBanner: {
         flexDirection: 'row',
-        backgroundColor: '#FFFBEB',
+        backgroundColor: Colors.accentTint,
         borderRadius: 20,
         borderWidth: 1.5,
-        borderColor: '#FDE68A',
+        borderColor: Colors.accentTint,
         padding: 16,
         marginBottom: 16,
         gap: 12,
         alignItems: 'flex-start',
-        shadowColor: '#D97706',
+        shadowColor: Colors.accent,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.08,
         shadowRadius: 8,
@@ -1062,7 +994,7 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: '#FEF3C7',
+        backgroundColor: Colors.accentTint,
         justifyContent: 'center',
         alignItems: 'center',
         flexShrink: 0,
@@ -1074,11 +1006,11 @@ const styles = StyleSheet.create({
     pendingBannerTitle: {
         fontSize: 14,
         fontWeight: '700',
-        color: '#92400E',
+        color: Colors.accent,
     },
     pendingBannerSub: {
         fontSize: 12,
-        color: '#B45309',
+        color: Colors.accent,
         lineHeight: 18,
     },
     pendingAboutMeBtn: {
@@ -1086,17 +1018,17 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 5,
         marginTop: 8,
-        backgroundColor: '#FEF3C7',
+        backgroundColor: Colors.accentTint,
         borderRadius: 20,
         paddingHorizontal: 12,
         paddingVertical: 6,
         alignSelf: 'flex-start',
         borderWidth: 1,
-        borderColor: '#FDE68A',
+        borderColor: Colors.accentTint,
     },
     pendingAboutMeBtnText: {
         fontSize: 12,
         fontWeight: '700',
-        color: '#D97706',
+        color: Colors.accent,
     },
 });

@@ -11,6 +11,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing } from '
 import { RootStackParamList } from '../types/navigation';
 import { MeditationIllustration, ThriveIllustration, StressIllustration, MirrorIllustration, VoiceRecordingIllustration } from '../components/MeditationIllustration';
 import { JourneyIcons } from '../components/JourneyIcons';
+import { Colors } from '../constants/colors';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width - 48; // 24px margin either side of the card
@@ -18,12 +19,12 @@ const SLIDE_WIDTH = width; // each page is a full-width viewport so the card rec
 
 // Deep royal-blue backdrop + soft blue / warm yellow accents — a deliberate
 // departure from the app's sage-green theme, scoped to this screen only.
-const DEEP_BLUE = '#141B4D';
-const DEEP_BLUE_LIGHT = '#232C72';
-const ACCENT_BLUE = '#4C6FFF';
-const ACCENT_YELLOW = '#FFC93C';
-const HEADING_COLOR = '#161B33';
-const BODY_GRAY = '#6B7280';
+const BRAND = Colors.primary;
+const BRAND_LIGHT = Colors.primarySoft;
+const ACCENT_COOL = Colors.plum;
+const ACCENT_WARM = Colors.ochre;
+const HEADING_COLOR = Colors.textPrimary;
+const BODY_GRAY = Colors.textSecondary;
 
 // One slide per real roadmap step (see DashboardScreen's ROADMAP_STEPS) — same
 // icons and accent colors as the in-app journey, so onboarding previews the
@@ -33,7 +34,7 @@ const SLIDES = [
         key: 'daily',
         title: 'Daily Check-ins',
         desc: 'Track your mood, stress, and sleep in just a minute a day, then unwind with short guided sessions.',
-        color: '#D97706',
+        color: Colors.accent,
         RoadmapIcon: JourneyIcons.Sun,
         Illustration: (size: number) => <MeditationIllustration width={size} height={size * 0.9} />,
     },
@@ -41,7 +42,7 @@ const SLIDES = [
         key: 'voice',
         title: 'Weekly Voice Journal',
         desc: 'A short reading captures your vocal wellbeing patterns over time.',
-        color: '#6366F1',
+        color: Colors.plum,
         RoadmapIcon: JourneyIcons.Microphone,
         Illustration: (size: number) => <VoiceRecordingIllustration width={size} height={size * 0.9} color="INDIGO" />,
     },
@@ -49,7 +50,7 @@ const SLIDES = [
         key: 'thrive',
         title: 'Thrive Tracker',
         desc: 'A quick wellbeing check-in every two weeks using the WEMWBS-14 scale.',
-        color: '#749F82',
+        color: Colors.primary,
         RoadmapIcon: JourneyIcons.Chart,
         Illustration: (size: number) => <ThriveIllustration width={size} height={size * 0.9} />,
     },
@@ -57,7 +58,7 @@ const SLIDES = [
         key: 'stress',
         title: 'Stress Snapshot',
         desc: 'See how your perceived stress shifts over the month with the PSS-10 scale.',
-        color: '#E07A5F',
+        color: Colors.accent,
         RoadmapIcon: JourneyIcons.StressCamera,
         Illustration: (size: number) => <StressIllustration width={size} height={size * 0.9} color="CORAL" />,
     },
@@ -65,7 +66,7 @@ const SLIDES = [
         key: 'mindful',
         title: 'Mindful Mirror',
         desc: 'Reflect on your mindfulness habits each month using the FFMQ-15 scale.',
-        color: '#0D9488',
+        color: Colors.sea,
         RoadmapIcon: JourneyIcons.Mirror,
         Illustration: (size: number) => <MirrorIllustration width={size} height={size * 0.9} color="TEAL" />,
     },
@@ -118,7 +119,7 @@ export default function OnboardingScreen() {
 
     return (
         <LinearGradient
-            colors={[DEEP_BLUE_LIGHT, DEEP_BLUE]}
+            colors={[BRAND_LIGHT, BRAND]}
             style={styles.container}
             start={{ x: 0.5, y: 0 }}
             end={{ x: 0.5, y: 1 }}
@@ -172,7 +173,7 @@ export default function OnboardingScreen() {
                                     <View
                                         style={[
                                             styles.roadmapLine,
-                                            reached && { backgroundColor: ACCENT_BLUE, opacity: 0.9 },
+                                            reached && { backgroundColor: ACCENT_COOL, opacity: 0.9 },
                                         ]}
                                     />
                                 )}
@@ -196,7 +197,7 @@ export default function OnboardingScreen() {
                 </View>
 
                 <TouchableOpacity style={styles.continueButton} onPress={handleNext} activeOpacity={0.85}>
-                    <Text style={styles.continueButtonText}>{isLast ? 'GET STARTED' : 'NEXT'}</Text>
+                    <Text style={styles.continueButtonText}>{isLast ? 'Get started' : 'Next'}</Text>
                 </TouchableOpacity>
             </View>
         </LinearGradient>
@@ -211,7 +212,7 @@ const styles = StyleSheet.create({
         width: 180,
         height: 180,
         borderRadius: 90,
-        backgroundColor: ACCENT_YELLOW,
+        backgroundColor: ACCENT_WARM,
         opacity: 0.12,
     },
     glowBlue: {
@@ -220,22 +221,22 @@ const styles = StyleSheet.create({
         width: 220,
         height: 220,
         borderRadius: 110,
-        backgroundColor: ACCENT_BLUE,
+        backgroundColor: ACCENT_COOL,
         opacity: 0.18,
     },
     topBar: { alignItems: 'flex-end', paddingHorizontal: 24, zIndex: 1 },
-    skipText: { color: 'rgba(255,255,255,0.72)', fontSize: 13, fontWeight: '600', letterSpacing: 1 },
+    skipText: { color: 'rgba(255,255,255,0.72)', fontSize: 13, fontWeight: '600', letterSpacing: 0.2 },
     carousel: { flex: 1 },
     slidePage: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24 },
     card: {
         width: CARD_WIDTH,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: Colors.white,
         borderRadius: 30,
         paddingTop: 32,
         paddingBottom: 28,
         paddingHorizontal: 24,
         alignItems: 'center',
-        shadowColor: '#000000',
+        shadowColor: Colors.shadow,
         shadowOffset: { width: 0, height: 18 },
         shadowOpacity: 0.25,
         shadowRadius: 28,
@@ -276,15 +277,15 @@ const styles = StyleSheet.create({
     roadmapLine: { width: 14, height: 2, backgroundColor: 'rgba(255,255,255,0.15)' },
     continueButton: {
         width: '100%',
-        backgroundColor: ACCENT_YELLOW,
+        backgroundColor: Colors.surface,
         borderRadius: 28,
         paddingVertical: 16,
         alignItems: 'center',
-        shadowColor: ACCENT_YELLOW,
+        shadowColor: Colors.shadow,
         shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.35,
+        shadowOpacity: 0.12,
         shadowRadius: 10,
         elevation: 6,
     },
-    continueButtonText: { color: DEEP_BLUE, fontWeight: 'bold', fontSize: 15, letterSpacing: 1 },
+    continueButtonText: { color: BRAND, fontWeight: '600', fontSize: 16, letterSpacing: 0.2 },
 });

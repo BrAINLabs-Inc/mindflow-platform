@@ -1,21 +1,20 @@
 import { ViewStyle } from 'react-native';
+import { Colors } from '../constants/colors';
 
-// The card shadow recipe repeated (with copy-paste drift — 0.03 vs 0.04 opacity,
-// 10 vs 12 vs 16 radius) across Journey/Calendar/Profile/Dashboard. Two named
-// variants instead: a resting card and a slightly more elevated one (hero/profile
-// cards), so any future drift is a deliberate choice, not a typo.
+// Two named shadow levels, warm-tinted and very soft, so cards float gently on
+// the sand background instead of sitting in hard grey boxes.
 export const cardShadow: ViewStyle = {
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.03,
-    shadowRadius: 12,
+    shadowOpacity: 0.05,
+    shadowRadius: 14,
     elevation: 2,
 };
 
 export const cardShadowElevated: ViewStyle = {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.04,
-    shadowRadius: 16,
+    shadowColor: Colors.shadow,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.07,
+    shadowRadius: 20,
     elevation: 4,
 };

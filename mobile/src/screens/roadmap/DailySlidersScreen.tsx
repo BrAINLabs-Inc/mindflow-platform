@@ -28,11 +28,12 @@ import { apiFetch, clearApiCache, getAuthToken } from '../../lib/apiClient';
 import { StressIcons, SleepIcons, RelaxationIcons } from '../../components/EmotionIcons';
 import { PopupModal } from '../../components/PopupModal';
 import { LeavesDecoration } from '../../components/LeavesDecoration';
+// This activity's tone from the shared palette (see Colors.tasks).
 const Colors = {
     ...GlobalColors,
-    primary: '#D97706',
+    primary: GlobalColors.tasks.daily.ink,
 };
-const THEME_BG = '#FFFBEB';
+const THEME_BG = GlobalColors.tasks.daily.tint;
 
 const { width } = Dimensions.get('window');
 
@@ -212,7 +213,7 @@ export default function DailySlidersScreen() {
                         message: 'You have successfully done the Daily Task. See you tomorrow again!',
                         isDaily: true,
                         themeColor: Colors.primary,
-                        themeBgGrad: [THEME_BG, '#FFF9F0', '#FFFFFF']
+                        themeBgGrad: [THEME_BG, Colors.accentTint, Colors.white]
                     });
                 } else if (data.videoPlaySeconds) {
                     setWatchedSeconds(data.videoPlaySeconds);
@@ -427,7 +428,7 @@ export default function DailySlidersScreen() {
                 message: 'You have successfully done the Daily Task. See you tomorrow again!',
                 isDaily: true,
                 themeColor: Colors.primary,
-                themeBgGrad: [THEME_BG, '#FFF9F0', '#FFFFFF']
+                themeBgGrad: [THEME_BG, Colors.accentTint, Colors.white]
             });
 
         } catch (error: any) {
@@ -487,7 +488,7 @@ export default function DailySlidersScreen() {
             {/* Header */}
             <View style={styles.header}>
                 <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-                    <Ionicons name="close" size={24} color="#1E293B" />
+                    <Ionicons name="close" size={24} color={Colors.textPrimary} />
                 </TouchableOpacity>
                 <Text style={styles.title}>Daily Check-in</Text>
                 <View style={styles.progressBadge}>
@@ -549,8 +550,8 @@ export default function DailySlidersScreen() {
                         {/* Stress */}
                         <View style={styles.samsungPanel}>
                             <View style={styles.sectionHeader}>
-                                <View style={[styles.sectionIconCircle, { backgroundColor: '#FEE2E2' }]}>
-                                    <Ionicons name="flash-outline" size={24} color="#EF4444" />
+                                <View style={[styles.sectionIconCircle, { backgroundColor: Colors.errorTint }]}>
+                                    <Ionicons name="flash-outline" size={24} color={Colors.error} />
                                 </View>
                                 <View style={{ flex: 1 }}>
                                     <Text style={styles.sectionTitle}>Stress Level</Text>
@@ -582,8 +583,8 @@ export default function DailySlidersScreen() {
                         {/* Factor */}
                         <View style={styles.samsungPanel}>
                             <View style={styles.sectionHeader}>
-                                <View style={[styles.sectionIconCircle, { backgroundColor: '#FEF3C7' }]}>
-                                    <Ionicons name="pricetag-outline" size={24} color="#F59E0B" />
+                                <View style={[styles.sectionIconCircle, { backgroundColor: Colors.accentTint }]}>
+                                    <Ionicons name="pricetag-outline" size={24} color={Colors.accent} />
                                 </View>
                                 <View style={{ flex: 1 }}>
                                     <Text style={styles.sectionTitle}>Primary Influencing Factor</Text>
@@ -612,7 +613,7 @@ export default function DailySlidersScreen() {
                                                     {item.label}
                                                 </Text>
                                                 {isSelected && (
-                                                    <Ionicons name="checkmark-circle" size={18} color="#FFFFFF" />
+                                                    <Ionicons name="checkmark-circle" size={18} color={Colors.white} />
                                                 )}
                                             </View>
                                             <Text style={[styles.factorDesc, isSelected && styles.factorDescSelected]}>
@@ -632,8 +633,8 @@ export default function DailySlidersScreen() {
                         {/* Sleep quality */}
                         <View style={styles.samsungPanel}>
                             <View style={styles.sectionHeader}>
-                                <View style={[styles.sectionIconCircle, { backgroundColor: '#DBEAFE' }]}>
-                                    <Ionicons name="moon-outline" size={24} color="#3B82F6" />
+                                <View style={[styles.sectionIconCircle, { backgroundColor: Colors.blueTint }]}>
+                                    <Ionicons name="moon-outline" size={24} color={Colors.blue} />
                                 </View>
                                 <View style={{ flex: 1 }}>
                                     <Text style={styles.sectionTitle}>Sleep Quality</Text>
@@ -757,7 +758,7 @@ export default function DailySlidersScreen() {
                             {!weeklyVideoId && (
                                 <View style={styles.recordingCard}>
                                     <View style={styles.recordingIcon}>
-                                        <Ionicons name="headset" size={48} color="#CBD5E1" />
+                                        <Ionicons name="headset" size={48} color={Colors.border} />
                                     </View>
                                     <View style={styles.recordingInfo}>
                                         <Text style={styles.recordingTitle}>
@@ -792,8 +793,8 @@ export default function DailySlidersScreen() {
                     <View style={styles.wizardCard}>
                         <View style={styles.samsungPanel}>
                             <View style={styles.sectionHeader}>
-                                <View style={[styles.sectionIconCircle, { backgroundColor: '#E0E7FF' }]}>
-                                    <Ionicons name="flower-outline" size={24} color="#6366F1" />
+                                <View style={[styles.sectionIconCircle, { backgroundColor: Colors.plumTint }]}>
+                                    <Ionicons name="flower-outline" size={24} color={Colors.plum} />
                                 </View>
                                 <View style={{ flex: 1 }}>
                                     <Text style={styles.sectionTitle}>Mindfulness Practice</Text>
@@ -813,7 +814,7 @@ export default function DailySlidersScreen() {
                                     <Ionicons
                                         name={mindfulnessPractice === 'yes' ? 'checkmark-circle' : 'checkmark-circle-outline'}
                                         size={22}
-                                        color={mindfulnessPractice === 'yes' ? '#FFFFFF' : Colors.primary}
+                                        color={mindfulnessPractice === 'yes' ? Colors.white : Colors.primary}
                                     />
                                     <Text style={[
                                         styles.yesNoText,
@@ -832,7 +833,7 @@ export default function DailySlidersScreen() {
                                     <Ionicons
                                         name={mindfulnessPractice === 'no' ? 'close-circle' : 'close-circle-outline'}
                                         size={22}
-                                        color={mindfulnessPractice === 'no' ? '#FFFFFF' : '#EF4444'}
+                                        color={mindfulnessPractice === 'no' ? Colors.white : Colors.error}
                                     />
                                     <Text style={[
                                         styles.yesNoText,
@@ -847,7 +848,7 @@ export default function DailySlidersScreen() {
                                     <TextInput
                                         style={styles.durationInput}
                                         placeholder="Min. 5 minutes (e.g. 15)"
-                                        placeholderTextColor="#94A3B8"
+                                        placeholderTextColor={Colors.textMuted}
                                         value={practiceDuration}
                                         onChangeText={setPracticeDuration}
                                         keyboardType="numeric"
@@ -947,7 +948,7 @@ export default function DailySlidersScreen() {
                             activeOpacity={0.7}
                         >
                             <Text style={styles.nextStepButtonText}>Next Step</Text>
-                            <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
+                            <Ionicons name="arrow-forward" size={20} color={Colors.white} />
                         </TouchableOpacity>
                     ) : (
                         <TouchableOpacity
@@ -960,11 +961,11 @@ export default function DailySlidersScreen() {
                             activeOpacity={0.7}
                         >
                             {isSubmitting ? (
-                                <ActivityIndicator color="#FFFFFF" size="small" />
+                                <ActivityIndicator color={Colors.white} size="small" />
                             ) : (
                                 <>
                                     <Text style={styles.submitStepButtonText}>Finish & Save</Text>
-                                    <Ionicons name="checkmark-done" size={20} color="#FFFFFF" />
+                                    <Ionicons name="checkmark-done" size={20} color={Colors.white} />
                                 </>
                             )}
                         </TouchableOpacity>
@@ -981,7 +982,7 @@ export default function DailySlidersScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F6F8F9', // Soft cream backdrop
+        backgroundColor: Colors.background, // Soft cream backdrop
     },
     loadingContainer: {
         flex: 1,
@@ -1000,9 +1001,9 @@ const styles = StyleSheet.create({
         height: 40,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: Colors.white,
         borderRadius: 20,
-        shadowColor: '#000',
+        shadowColor: Colors.shadow,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 5,
@@ -1011,7 +1012,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 20,
         fontWeight: '700',
-        color: '#2D3436',
+        color: Colors.textPrimary,
     },
     progressBadge: {
         backgroundColor: THEME_BG,
@@ -1031,7 +1032,7 @@ const styles = StyleSheet.create({
     },
     progressBarBg: {
         height: 8,
-        backgroundColor: '#E2E8F0',
+        backgroundColor: Colors.border,
         borderRadius: 4,
         width: '100%',
         overflow: 'hidden',
@@ -1044,7 +1045,7 @@ const styles = StyleSheet.create({
     stepIndicator: {
         fontSize: 12,
         fontWeight: '600',
-        color: '#64748B',
+        color: Colors.textSecondary,
         marginTop: 6,
     },
     content: {
@@ -1057,12 +1058,12 @@ const styles = StyleSheet.create({
         minHeight: 300,
     },
     samsungPanel: {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: Colors.white,
         borderRadius: 24,
         padding: 24,
         marginBottom: 16,
         borderWidth: 1.5,
-        borderColor: '#E2E8F0',
+        borderColor: Colors.border,
     },
     sectionHeader: {
         flexDirection: 'row',
@@ -1073,7 +1074,7 @@ const styles = StyleSheet.create({
         width: 44,
         height: 44,
         borderRadius: 22,
-        backgroundColor: '#EEF2FF',
+        backgroundColor: Colors.plumTint,
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 12,
@@ -1081,11 +1082,11 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#2D3436',
+        color: Colors.textPrimary,
     },
     sectionSubtitle: {
         fontSize: 12,
-        color: '#64748B',
+        color: Colors.textSecondary,
         marginTop: 2,
         lineHeight: 16,
     },
@@ -1102,47 +1103,47 @@ const styles = StyleSheet.create({
         gap: 8,
         paddingVertical: 16,
         borderRadius: 30, // Premium rounded pill
-        backgroundColor: '#F1F5F9',
+        backgroundColor: Colors.surfaceMuted,
         borderWidth: 1.5,
-        borderColor: '#E2E8F0',
+        borderColor: Colors.border,
     },
     yesButtonSelected: {
         backgroundColor: Colors.primary,
         borderColor: Colors.primary,
     },
     noButtonSelected: {
-        backgroundColor: '#EF4444',
-        borderColor: '#EF4444',
+        backgroundColor: Colors.error,
+        borderColor: Colors.error,
     },
     yesNoText: {
         fontSize: 15,
         fontWeight: '600',
-        color: '#475569',
+        color: Colors.textSecondary,
     },
     yesNoTextSelected: {
-        color: '#FFFFFF',
+        color: Colors.white,
     },
     practiceDetails: {
         marginTop: 20,
         paddingTop: 20,
         borderTopWidth: 1,
-        borderTopColor: '#F1F5F9',
+        borderTopColor: Colors.surfaceMuted,
     },
     practiceLabel: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#2D3436',
+        color: Colors.textPrimary,
         marginBottom: 8,
     },
     durationInput: {
-        backgroundColor: '#F6F8F9',
+        backgroundColor: Colors.background,
         borderRadius: 30, // Consistent rounded styling
         paddingHorizontal: 20,
         paddingVertical: 14,
         fontSize: 15,
-        color: '#2D3436',
+        color: Colors.textPrimary,
         borderWidth: 1.5,
-        borderColor: '#E2E8F0',
+        borderColor: Colors.border,
     },
     practiceGrid: {
         flexDirection: 'row',
@@ -1152,10 +1153,10 @@ const styles = StyleSheet.create({
     practiceChip: {
         paddingHorizontal: 16,
         paddingVertical: 10,
-        backgroundColor: '#F1F5F9',
+        backgroundColor: Colors.surfaceMuted,
         borderRadius: 30, // Rounded pill
         borderWidth: 1,
-        borderColor: '#E2E8F0',
+        borderColor: Colors.border,
     },
     practiceChipSelected: {
         backgroundColor: Colors.primary,
@@ -1163,10 +1164,10 @@ const styles = StyleSheet.create({
     },
     practiceChipText: {
         fontSize: 13,
-        color: '#475569',
+        color: Colors.textSecondary,
     },
     practiceChipTextSelected: {
-        color: '#FFFFFF',
+        color: Colors.white,
         fontWeight: '600',
     },
     emojiRow: {
@@ -1179,7 +1180,7 @@ const styles = StyleSheet.create({
         aspectRatio: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#F6F8F9',
+        backgroundColor: Colors.background,
         borderRadius: 20,
         borderWidth: 2,
         borderColor: 'transparent',
@@ -1195,16 +1196,16 @@ const styles = StyleSheet.create({
     },
     scaleText: {
         fontSize: 11,
-        color: '#94A3B8',
+        color: Colors.textMuted,
         fontWeight: '500',
     },
     factorChip: {
         width: '100%',
         padding: 16,
-        backgroundColor: '#F6F8F9',
+        backgroundColor: Colors.background,
         borderRadius: 20,
         borderWidth: 1.5,
-        borderColor: '#E2E8F0',
+        borderColor: Colors.border,
     },
     factorChipSelected: {
         backgroundColor: Colors.primary,
@@ -1213,23 +1214,23 @@ const styles = StyleSheet.create({
     factorText: {
         fontSize: 15,
         fontWeight: '700',
-        color: '#2D3436',
+        color: Colors.textPrimary,
     },
     factorTextSelected: {
-        color: '#FFFFFF',
+        color: Colors.white,
     },
     factorDesc: {
         fontSize: 12,
-        color: '#64748B',
+        color: Colors.textSecondary,
         marginTop: 4,
     },
     factorDescSelected: {
-        color: '#E6F4EA',
+        color: Colors.primaryTint,
     },
     timeSectionLabel: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#2D3436',
+        color: Colors.textPrimary,
         marginBottom: 8,
     },
     timeScroll: {
@@ -1238,11 +1239,11 @@ const styles = StyleSheet.create({
     timeChip: {
         paddingHorizontal: 16,
         paddingVertical: 10,
-        backgroundColor: '#F1F5F9',
+        backgroundColor: Colors.surfaceMuted,
         borderRadius: 30, // Rounded pill
         marginHorizontal: 4,
         borderWidth: 1,
-        borderColor: '#E2E8F0',
+        borderColor: Colors.border,
     },
     timeChipSelected: {
         backgroundColor: Colors.primary,
@@ -1250,10 +1251,10 @@ const styles = StyleSheet.create({
     },
     timeChipText: {
         fontSize: 13,
-        color: '#475569',
+        color: Colors.textSecondary,
     },
     timeChipTextSelected: {
-        color: '#FFFFFF',
+        color: Colors.white,
         fontWeight: '600',
     },
     // Bleeds past `content`'s 20px padding so the player runs edge-to-edge — wider and more
@@ -1268,11 +1269,11 @@ const styles = StyleSheet.create({
     recordingCard: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#F6F8F9',
+        backgroundColor: Colors.background,
         borderRadius: 20,
         padding: 16,
         borderWidth: 1.5,
-        borderColor: '#E2E8F0',
+        borderColor: Colors.border,
         marginBottom: 16,
     },
     recordingIcon: {
@@ -1284,11 +1285,11 @@ const styles = StyleSheet.create({
     recordingTitle: {
         fontSize: 15,
         fontWeight: '600',
-        color: '#2D3436',
+        color: Colors.textPrimary,
     },
     recordingDuration: {
         fontSize: 12,
-        color: '#64748B',
+        color: Colors.textSecondary,
         marginTop: 2,
     },
     watchProgressText: {
@@ -1301,7 +1302,7 @@ const styles = StyleSheet.create({
     stepTip: {
         fontSize: 11,
         fontStyle: 'italic',
-        color: '#94A3B8',
+        color: Colors.textMuted,
         lineHeight: 16,
         textAlign: 'center',
         marginTop: 8,
@@ -1321,13 +1322,13 @@ const styles = StyleSheet.create({
         paddingVertical: 16,
         borderRadius: 30, // Matching corner radius
         borderWidth: 1.5,
-        borderColor: '#DFE6E9',
-        backgroundColor: '#FFFFFF',
+        borderColor: Colors.border,
+        backgroundColor: Colors.white,
     },
     backStepButtonText: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#636E72',
+        color: Colors.textSecondary,
     },
     nextStepButton: {
         flex: 2,
@@ -1340,13 +1341,13 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.primary,
     },
     nextStepButtonDisabled: {
-        backgroundColor: '#DFE6E9',
+        backgroundColor: Colors.border,
         opacity: 0.7,
     },
     nextStepButtonText: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: Colors.white,
     },
     submitStepButton: {
         flex: 2,
@@ -1364,13 +1365,13 @@ const styles = StyleSheet.create({
         elevation: 3,
     },
     submitStepButtonDisabled: {
-        backgroundColor: '#DFE6E9',
+        backgroundColor: Colors.border,
         opacity: 0.7,
     },
     submitStepButtonText: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: Colors.white,
     },
     successContainer: {
         flex: 1,
@@ -1390,12 +1391,12 @@ const styles = StyleSheet.create({
     successTitle: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#1E293B',
+        color: Colors.textPrimary,
         marginBottom: 12,
     },
     successText: {
         fontSize: 16,
-        color: '#64748B',
+        color: Colors.textSecondary,
         textAlign: 'center',
     },
     homeButton: {
@@ -1406,7 +1407,7 @@ const styles = StyleSheet.create({
         marginTop: 32,
     },
     homeButtonText: {
-        color: '#FFFFFF',
+        color: Colors.white,
         fontSize: 16,
         fontWeight: '600',
     },

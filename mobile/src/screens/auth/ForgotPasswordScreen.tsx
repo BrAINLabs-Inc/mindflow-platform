@@ -141,7 +141,7 @@ export default function ForgotPasswordScreen() {
                     <Animated.View
                         style={[styles.bottomPanel, panelStyle, { minHeight: height - headerHeight, paddingBottom: insets.bottom }]}
                     >
-                        <Text style={styles.panelTitle}>RESET PASSWORD</Text>
+                        <Text style={styles.panelTitle}>Reset password</Text>
                         <Text style={styles.panelSubtitle}>WE&apos;LL EMAIL YOU A CODE</Text>
 
                         <View style={styles.formContainer}>
@@ -149,7 +149,7 @@ export default function ForgotPasswordScreen() {
                                 <TextInput
                                     style={styles.input}
                                     placeholder="Email Address"
-                                    placeholderTextColor="#90A4AE"
+                                    placeholderTextColor={Colors.textMuted}
                                     value={email}
                                     onChangeText={locked ? undefined : setEmail}
                                     editable={!locked}
@@ -171,14 +171,14 @@ export default function ForgotPasswordScreen() {
                                 disabled={loading}
                             >
                                 {loading ? (
-                                    <ActivityIndicator color="#FFFFFF" size="small" />
+                                    <ActivityIndicator color={Colors.white} size="small" />
                                 ) : (
-                                    <Text style={styles.sendButtonText}>SEND CODE</Text>
+                                    <Text style={styles.sendButtonText}>Send code</Text>
                                 )}
                             </TouchableOpacity>
 
                             <TouchableOpacity onPress={() => navigation.goBack()} style={styles.switchButton}>
-                                <Text style={styles.switchText}>{locked ? 'CANCEL' : 'BACK TO LOGIN'}</Text>
+                                <Text style={styles.switchText}>{locked ? 'Cancel' : 'Back to login'}</Text>
                             </TouchableOpacity>
                         </View>
 
@@ -200,7 +200,7 @@ export default function ForgotPasswordScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#F6F8F9' },
+    container: { flex: 1, backgroundColor: Colors.background },
     keyboardView: { flex: 1 },
     fixedHeader: {
         position: 'absolute',
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     scrollContent: { flexGrow: 1, alignItems: 'center' },
     illustrationContainer: { alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
     bottomPanel: {
-        backgroundColor: '#E3F2FD',
+        backgroundColor: Colors.surfaceMuted,
         width: '100%',
         borderTopLeftRadius: 40,
         borderTopRightRadius: 40,
@@ -221,29 +221,29 @@ const styles = StyleSheet.create({
         paddingBottom: 104,
         paddingHorizontal: 24,
         alignItems: 'center',
-        shadowColor: '#000',
+        shadowColor: Colors.shadow,
         shadowOffset: { width: 0, height: -2 },
         shadowOpacity: 0.05,
         shadowRadius: 5,
         elevation: 10,
         overflow: 'hidden',
     },
-    panelTitle: { fontSize: 14, fontWeight: '600', color: '#636E72', letterSpacing: 2, marginBottom: 5 },
-    panelSubtitle: { fontSize: 18, fontWeight: 'bold', color: '#2D3436', letterSpacing: 1, marginBottom: 20 },
+    panelTitle: { fontSize: 14, fontWeight: '600', color: Colors.textSecondary, letterSpacing: 0.2, marginBottom: 5 },
+    panelSubtitle: { fontSize: 18, fontWeight: 'bold', color: Colors.textPrimary, letterSpacing: 0.2, marginBottom: 20 },
     formContainer: { width: '100%', gap: 12 },
     inputWrapper: {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: Colors.white,
         borderRadius: 30,
         paddingHorizontal: 20,
         paddingVertical: 12,
-        shadowColor: '#000',
+        shadowColor: Colors.shadow,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 3,
         elevation: 2,
     },
-    input: { fontSize: 16, color: '#2D3436' },
-    hintText: { fontSize: 12, color: '#90A4AE', lineHeight: 18, textAlign: 'center', paddingHorizontal: 8 },
+    input: { fontSize: 16, color: Colors.textPrimary },
+    hintText: { fontSize: 12, color: Colors.textMuted, lineHeight: 18, textAlign: 'center', paddingHorizontal: 8 },
     sendButton: {
         backgroundColor: Colors.primary,
         borderRadius: 30,
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
         elevation: 4,
         marginTop: 5,
     },
-    sendButtonText: { color: '#FFFFFF', fontWeight: 'bold', fontSize: 16, letterSpacing: 1 },
+    sendButtonText: { color: Colors.white, fontWeight: 'bold', fontSize: 16, letterSpacing: 0.2 },
     switchButton: { paddingVertical: 12, alignItems: 'center' },
-    switchText: { color: Colors.primary, fontWeight: 'bold', fontSize: 12, letterSpacing: 1, textDecorationLine: 'underline' },
+    switchText: { color: Colors.primary, fontWeight: 'bold', fontSize: 12, letterSpacing: 0.2, textDecorationLine: 'underline' },
 });

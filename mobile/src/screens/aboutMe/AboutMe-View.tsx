@@ -86,8 +86,8 @@ export default function AboutMeViewScreen() {
                     </View>
 
                     <View style={[panelStyles.introPanel, { paddingBottom: 28 + insets.bottom }]}>
-                        <Text style={panelStyles.introPanelTitle}>YOUR PROFILE</Text>
-                        <Text style={panelStyles.introPanelSubtitle}>PROFILE COMPLETED</Text>
+                        <Text style={panelStyles.introPanelTitle}>Your profile</Text>
+                        <Text style={panelStyles.introPanelSubtitle}>Profile completed</Text>
 
                         <View style={styles.successBanner}>
                             <Ionicons name="checkmark-circle" size={24} color={ABOUT_ME_ACCENT} />
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.surface,
         borderRadius: 20,
         marginBottom: 16,
-        shadowColor: '#475569',
+        shadowColor: Colors.textSecondary,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.04,
         shadowRadius: 8,
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 20,
         paddingVertical: 16,
-        backgroundColor: '#F8FAFC',
+        backgroundColor: Colors.surfaceMuted,
         borderBottomWidth: 1,
         borderColor: Colors.surfaceMuted,
         gap: 12,
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     cardHeaderText: {
         fontSize: 15,
         fontWeight: '700',
-        color: '#1A1A2E',
+        color: Colors.textPrimary,
     },
     cardBody: {
         padding: 20,
@@ -261,7 +261,6 @@ const styles = StyleSheet.create({
         fontSize: 11,
         fontWeight: '700',
         color: Colors.textMuted,
-        textTransform: 'uppercase',
         letterSpacing: 0.8,
         marginBottom: 4,
     },

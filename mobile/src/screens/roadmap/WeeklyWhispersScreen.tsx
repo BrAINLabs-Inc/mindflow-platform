@@ -25,11 +25,12 @@ import { VoiceRecordingIllustration } from '../../components/MeditationIllustrat
 import { LeavesDecoration } from '../../components/LeavesDecoration';
 import { PanelWave } from '../../components/PanelWave';
 import { PopupModal } from '../../components/PopupModal';
+// This activity's tone from the shared palette (see Colors.tasks).
 const Colors = {
     ...GlobalColors,
-    primary: '#6366F1',
+    primary: GlobalColors.tasks.weekly.ink,
 };
-const THEME_BG = '#EEF2FF';
+const THEME_BG = GlobalColors.tasks.weekly.tint;
 
 const { width } = Dimensions.get('window');
 
@@ -341,7 +342,7 @@ export default function WeeklyWhispersScreen() {
                                 message: 'Your voice recording has been submitted successfully. See you next week!',
                                 buttonText: 'Back to Journey',
                                 themeColor: Colors.primary,
-                                themeBgGrad: [THEME_BG, '#E0E7FF', '#FFFFFF']
+                                themeBgGrad: [THEME_BG, Colors.plumTint, Colors.white]
                             }
                         }
                     ],
@@ -381,7 +382,7 @@ export default function WeeklyWhispersScreen() {
 
                 <View style={styles.header}>
                     <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                        <Ionicons name="arrow-back" size={24} color="#1E293B" />
+                        <Ionicons name="arrow-back" size={24} color={Colors.textPrimary} />
                     </TouchableOpacity>
                     <Text style={styles.title}>Weekly Whispers</Text>
                     <View style={{ width: 40 }} />
@@ -427,7 +428,7 @@ export default function WeeklyWhispersScreen() {
 
                 <View style={styles.header}>
                     <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                        <Ionicons name="arrow-back" size={24} color="#1E293B" />
+                        <Ionicons name="arrow-back" size={24} color={Colors.textPrimary} />
                     </TouchableOpacity>
                     <Text style={styles.title}>Weekly Whispers</Text>
                     <View style={{ width: 40 }} />
@@ -440,8 +441,8 @@ export default function WeeklyWhispersScreen() {
                         </View>
 
                         <View style={[styles.introPanel, { paddingBottom: 28 + insets.bottom }]}>
-                            <Text style={styles.introPanelLabel}>VOCAL BIOMARKER CAPTURE</Text>
-                            <Text style={styles.introPanelHeadline}>VOICE RECORDING</Text>
+                            <Text style={styles.introPanelLabel}>Vocal biomarker capture</Text>
+                            <Text style={styles.introPanelHeadline}>Voice recording</Text>
 
                             <View style={styles.introCard}>
                                 <View style={styles.introIconRow}>
@@ -471,7 +472,7 @@ export default function WeeklyWhispersScreen() {
                                 onPress={() => setCurrentStep('recording')}
                             >
                                 <Text style={styles.goButtonText}>Let&apos;s Go</Text>
-                                <Ionicons name="arrow-forward" size={24} color="#FFFFFF" />
+                                <Ionicons name="arrow-forward" size={24} color={Colors.white} />
                             </TouchableOpacity>
 
                             <PanelWave />
@@ -526,7 +527,7 @@ export default function WeeklyWhispersScreen() {
                     }}
                     style={styles.backButton}
                 >
-                    <Ionicons name="arrow-back" size={24} color="#1E293B" />
+                    <Ionicons name="arrow-back" size={24} color={Colors.textPrimary} />
                 </TouchableOpacity>
                 <Text style={styles.title}>Weekly Whispers</Text>
                 <View style={styles.progressBadge}>
@@ -567,7 +568,7 @@ export default function WeeklyWhispersScreen() {
                                         <Ionicons
                                             name={isRecording ? "stop" : "mic"}
                                             size={36}
-                                            color="#FFFFFF"
+                                            color={Colors.white}
                                         />
                                     </View>
                                 </TouchableOpacity>
@@ -589,7 +590,7 @@ export default function WeeklyWhispersScreen() {
                                 <>
                                     <View style={styles.sectionBadge}>
                                         <Ionicons name="book-outline" size={14} color={Colors.primary} />
-                                        <Text style={styles.sectionBadgeText}>PASSAGE TO READ</Text>
+                                        <Text style={styles.sectionBadgeText}>Passage to read</Text>
                                     </View>
 
                                     <View style={styles.passageContainer}>
@@ -610,8 +611,8 @@ export default function WeeklyWhispersScreen() {
                             {recordingUri && (
                                 <View style={styles.reviewSection}>
                                     <View style={[styles.sectionBadge, styles.sectionBadgeSuccess]}>
-                                        <Ionicons name="checkmark-circle" size={14} color="#16A34A" />
-                                        <Text style={[styles.sectionBadgeText, styles.sectionBadgeTextSuccess]}>RECORDING READY</Text>
+                                        <Ionicons name="checkmark-circle" size={14} color={Colors.primary} />
+                                        <Text style={[styles.sectionBadgeText, styles.sectionBadgeTextSuccess]}>Recording ready</Text>
                                     </View>
 
                                     <View style={styles.waveformContainer}>
@@ -635,10 +636,10 @@ export default function WeeklyWhispersScreen() {
                                             activeOpacity={0.7}
                                         >
                                             {uploading ? (
-                                                <ActivityIndicator color="#FFFFFF" />
+                                                <ActivityIndicator color={Colors.white} />
                                             ) : (
                                                 <>
-                                                    <Ionicons name="cloud-upload-outline" size={20} color="#FFFFFF" />
+                                                    <Ionicons name="cloud-upload-outline" size={20} color={Colors.white} />
                                                     <Text style={styles.submitButtonText}>Submit</Text>
                                                 </>
                                             )}
@@ -659,7 +660,7 @@ export default function WeeklyWhispersScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F6F8F9', // Soft cream backdrop
+        backgroundColor: Colors.background, // Soft cream backdrop
     },
     loadingContainer: {
         flex: 1,
@@ -678,9 +679,9 @@ const styles = StyleSheet.create({
         height: 40,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: Colors.white,
         borderRadius: 20,
-        shadowColor: '#000',
+        shadowColor: Colors.shadow,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 5,
@@ -689,7 +690,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 20,
         fontWeight: '700',
-        color: '#2D3436',
+        color: Colors.textPrimary,
     },
     progressBadge: {
         backgroundColor: THEME_BG,
@@ -728,7 +729,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 24,
         alignItems: 'center',
         overflow: 'hidden',
-        shadowColor: '#000',
+        shadowColor: Colors.shadow,
         shadowOffset: { width: 0, height: -2 },
         shadowOpacity: 0.05,
         shadowRadius: 5,
@@ -737,24 +738,24 @@ const styles = StyleSheet.create({
     introPanelLabel: {
         fontSize: 13,
         fontWeight: '600',
-        color: '#636E72',
-        letterSpacing: 2,
+        color: Colors.textSecondary,
+        letterSpacing: 0.2,
         marginBottom: 2,
     },
     introPanelHeadline: {
         fontSize: 17,
         fontWeight: 'bold',
-        color: '#2D3436',
-        letterSpacing: 1,
+        color: Colors.textPrimary,
+        letterSpacing: 0.2,
         marginBottom: 20,
     },
     introCard: {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: Colors.white,
         borderRadius: 24,
         padding: 16,
         width: '100%',
         marginBottom: 16,
-        shadowColor: '#000',
+        shadowColor: Colors.shadow,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.04,
         shadowRadius: 12,
@@ -777,11 +778,11 @@ const styles = StyleSheet.create({
     introCardTitle: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#2D3436',
+        color: Colors.textPrimary,
     },
     introCardText: {
         fontSize: 14,
-        color: '#636E72',
+        color: Colors.textSecondary,
         lineHeight: 22,
     },
     infoBadges: {
@@ -824,7 +825,7 @@ const styles = StyleSheet.create({
     goButtonText: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: Colors.white,
     },
     // Recording Screen
     panelBody: {
@@ -837,12 +838,12 @@ const styles = StyleSheet.create({
         width: 128,
         height: 128,
         borderRadius: 64,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: Colors.white,
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 12,
         marginBottom: 12,
-        shadowColor: '#000',
+        shadowColor: Colors.shadow,
         shadowOffset: { width: 0, height: 6 },
         shadowOpacity: 0.08,
         shadowRadius: 16,
@@ -862,28 +863,28 @@ const styles = StyleSheet.create({
         elevation: 6,
     },
     recordButtonActive: {
-        backgroundColor: '#EF4444',
-        shadowColor: '#EF4444',
+        backgroundColor: Colors.error,
+        shadowColor: Colors.error,
     },
     recordPulseRing: {
         position: 'absolute',
         width: 88,
         height: 88,
         borderRadius: 44,
-        backgroundColor: '#EF4444',
+        backgroundColor: Colors.error,
     },
     statusText: {
         fontSize: 15,
         fontWeight: '600',
-        color: '#64748B',
+        color: Colors.textSecondary,
     },
     statusRecording: {
-        color: '#EF4444',
+        color: Colors.error,
         fontWeight: '700',
     },
     hintText: {
         fontSize: 12,
-        color: '#94A3B8',
+        color: Colors.textMuted,
         marginTop: 4,
     },
     recordingIndicator: {
@@ -891,23 +892,23 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: 16,
-        backgroundColor: '#FEF2F2',
+        backgroundColor: Colors.errorTint,
         paddingVertical: 10,
         paddingHorizontal: 16,
         borderRadius: 20,
         borderWidth: 1,
-        borderColor: '#FEE2E2',
+        borderColor: Colors.errorTint,
     },
     pulseDot: {
         width: 8,
         height: 8,
         borderRadius: 4,
-        backgroundColor: '#EF4444',
+        backgroundColor: Colors.error,
         marginRight: 8,
     },
     recordingText: {
         fontSize: 13,
-        color: '#EF4444',
+        color: Colors.error,
         fontWeight: '600',
     },
     // Passage Section
@@ -926,23 +927,23 @@ const styles = StyleSheet.create({
         fontSize: 11,
         fontWeight: '700',
         color: Colors.primary,
-        letterSpacing: 1.5,
+        letterSpacing: 0.2,
     },
     sectionBadgeSuccess: {
-        backgroundColor: '#DCFCE7',
+        backgroundColor: Colors.primaryTint,
     },
     sectionBadgeTextSuccess: {
-        color: '#16A34A',
+        color: Colors.primary,
     },
     passageContainer: {
-        backgroundColor: '#F8FAFC',
+        backgroundColor: Colors.surfaceMuted,
         borderRadius: 16,
         padding: 14,
         borderWidth: 1,
-        borderColor: '#E2E8F0',
+        borderColor: Colors.border,
         marginBottom: 4,
         minHeight: 150,
-        shadowColor: '#000',
+        shadowColor: Colors.shadow,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.03,
         shadowRadius: 6,
@@ -950,7 +951,7 @@ const styles = StyleSheet.create({
     },
     passageText: {
         fontSize: 13.5,
-        color: '#475569',
+        color: Colors.textSecondary,
         lineHeight: 21,
     },
     // Review Screen
@@ -959,7 +960,7 @@ const styles = StyleSheet.create({
         marginTop: 16,
         paddingTop: 16,
         borderTopWidth: 1,
-        borderTopColor: '#E2E8F0',
+        borderTopColor: Colors.border,
     },
     waveformContainer: {
         flexDirection: 'row',
@@ -968,7 +969,7 @@ const styles = StyleSheet.create({
         height: 50,
         marginBottom: 16,
         width: '100%',
-        backgroundColor: '#F1F5F9',
+        backgroundColor: Colors.surfaceMuted,
         borderRadius: 20,
         paddingHorizontal: 20,
     },
@@ -982,7 +983,7 @@ const styles = StyleSheet.create({
     reviewDuration: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#64748B',
+        color: Colors.textSecondary,
         marginBottom: 16,
         textAlign: 'center',
     },
@@ -1000,8 +1001,8 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
         borderRadius: 30,
         borderWidth: 1.5,
-        borderColor: '#DFE6E9',
-        backgroundColor: '#FFFFFF',
+        borderColor: Colors.border,
+        backgroundColor: Colors.white,
     },
     retryButtonText: {
         fontSize: 16,
@@ -1029,7 +1030,7 @@ const styles = StyleSheet.create({
     submitButtonText: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: Colors.white,
     },
     // Success screen
     successContainer: {
@@ -1054,13 +1055,13 @@ const styles = StyleSheet.create({
     successTitle: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#2D3436',
+        color: Colors.textPrimary,
         marginBottom: 8,
         textAlign: 'center',
     },
     successText: {
         fontSize: 14,
-        color: '#636E72',
+        color: Colors.textSecondary,
         textAlign: 'center',
         lineHeight: 20,
         marginBottom: 16,
@@ -1077,7 +1078,7 @@ const styles = StyleSheet.create({
         elevation: 2,
     },
     homeButtonText: {
-        color: '#FFFFFF',
+        color: Colors.white,
         fontSize: 16,
         fontWeight: '700',
     },

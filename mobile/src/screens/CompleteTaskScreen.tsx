@@ -43,10 +43,10 @@ export default function CompleteTaskScreen() {
     }));
 
     // Choose theme colors dynamically
-    const themeColor = paramThemeColor || (isDaily ? '#D97706' : Colors.primary);
+    const themeColor = paramThemeColor || (isDaily ? Colors.accent : Colors.primary);
     const themeBgGrad = paramThemeBgGrad || (isDaily
-        ? ['#FFFBEB', '#FFF9F0', '#FFFFFF'] as const
-        : ['#E6F4EA', '#F1F7F3', '#FFFFFF'] as const);
+        ? [Colors.accentTint, Colors.accentTint, Colors.white] as const
+        : [Colors.primaryTint, Colors.primaryTint, Colors.white] as const);
 
     return (
         <LinearGradient
@@ -134,13 +134,13 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#1E293B',
+        color: Colors.textPrimary,
         marginBottom: 8,
         textAlign: 'center',
     },
     message: {
         fontSize: 15,
-        color: '#64748B',
+        color: Colors.textSecondary,
         textAlign: 'center',
         lineHeight: 22,
         paddingHorizontal: 16,
@@ -157,9 +157,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     homeButtonText: {
-        color: '#FFFFFF',
+        color: Colors.white,
         fontSize: 16,
         fontWeight: 'bold',
-        letterSpacing: 1,
+        letterSpacing: 0.2,
     },
 });

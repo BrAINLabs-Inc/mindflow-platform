@@ -169,15 +169,15 @@ export default function LoginScreen() {
                     <Animated.View 
                         style={[styles.bottomPanel, panelStyle, { minHeight: height - headerHeight, paddingBottom: insets.bottom }]}
                     >
-                        <Text style={styles.panelTitle}>WELCOME BACK</Text>
-                        <Text style={styles.panelSubtitle}>LOGIN TO CONTINUE</Text>
+                        <Text style={styles.panelTitle}>Welcome back</Text>
+                        <Text style={styles.panelSubtitle}>Log in to continue</Text>
 
                         <View style={styles.formContainer}>
                             <View style={styles.inputWrapper}>
                                 <TextInput
                                     style={styles.input}
                                     placeholder="Email Address"
-                                    placeholderTextColor="#90A4AE"
+                                    placeholderTextColor={Colors.textMuted}
                                     value={email}
                                     onChangeText={setEmail}
                                     autoCapitalize="none"
@@ -193,7 +193,7 @@ export default function LoginScreen() {
                                     ref={passwordRef}
                                     style={[styles.input, { flex: 1 }]}
                                     placeholder="Password"
-                                    placeholderTextColor="#90A4AE"
+                                    placeholderTextColor={Colors.textMuted}
                                     value={password}
                                     onChangeText={setPassword}
                                     secureTextEntry={!showPassword}
@@ -202,7 +202,7 @@ export default function LoginScreen() {
                                     onSubmitEditing={handleLogin}
                                 />
                                 <TouchableOpacity onPress={() => setShowPassword(p => !p)} style={{ padding: 4 }}>
-                                    <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={22} color="#90A4AE" />
+                                    <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={22} color={Colors.textMuted} />
                                 </TouchableOpacity>
                             </View>
 
@@ -216,14 +216,14 @@ export default function LoginScreen() {
                                 disabled={loading}
                             >
                                 {loading ? (
-                                    <ActivityIndicator color="#FFFFFF" size="small" />
+                                    <ActivityIndicator color={Colors.white} size="small" />
                                 ) : (
-                                    <Text style={styles.loginButtonText}>LOG IN</Text>
+                                    <Text style={styles.loginButtonText}>Log in</Text>
                                 )}
                             </TouchableOpacity>
 
                             <TouchableOpacity onPress={() => navigation.navigate('Signup')} style={styles.switchButton}>
-                                <Text style={styles.switchText}>OR SIGN UP</Text>
+                                <Text style={styles.switchText}>Or sign up</Text>
                             </TouchableOpacity>
 
                             {/* Dev-only: onboarding is otherwise a one-time, first-launch-only
@@ -262,7 +262,7 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#F6F8F9' },
+    container: { flex: 1, backgroundColor: Colors.background },
     keyboardView: { flex: 1 },
     fixedHeader: {
         position: 'absolute',
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
     scrollContent: { flexGrow: 1, alignItems: 'center' },
     illustrationContainer: { alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
     bottomPanel: {
-        backgroundColor: '#E3F2FD',
+        backgroundColor: Colors.surfaceMuted,
         width: '100%',
         borderTopLeftRadius: 40,
         borderTopRightRadius: 40,
@@ -283,28 +283,28 @@ const styles = StyleSheet.create({
         paddingBottom: 104,   // extra space for wave
         paddingHorizontal: 24,
         alignItems: 'center',
-        shadowColor: '#000',
+        shadowColor: Colors.shadow,
         shadowOffset: { width: 0, height: -2 },
         shadowOpacity: 0.05,
         shadowRadius: 5,
         elevation: 10,
         overflow: 'hidden',   // clip wave inside panel
     },
-    panelTitle: { fontSize: 13, fontWeight: '600', color: '#636E72', letterSpacing: 2, marginBottom: 2 },
-    panelSubtitle: { fontSize: 17, fontWeight: 'bold', color: '#2D3436', letterSpacing: 1, marginBottom: 14 },
+    panelTitle: { fontSize: 13, fontWeight: '600', color: Colors.textSecondary, letterSpacing: 0.2, marginBottom: 2 },
+    panelSubtitle: { fontSize: 17, fontWeight: 'bold', color: Colors.textPrimary, letterSpacing: 0.2, marginBottom: 14 },
     formContainer: { width: '100%', gap: 10 },
     inputWrapper: {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: Colors.white,
         borderRadius: 26,
         paddingHorizontal: 18,
         paddingVertical: 10,
-        shadowColor: '#000',
+        shadowColor: Colors.shadow,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 3,
         elevation: 2,
     },
-    input: { fontSize: 15, color: '#2D3436' },
+    input: { fontSize: 15, color: Colors.textPrimary },
     forgotButton: { alignSelf: 'flex-end', paddingVertical: 4, paddingHorizontal: 4 },
     forgotText: { fontSize: 13, fontWeight: '600', color: Colors.primary },
     loginButton: {
@@ -319,19 +319,17 @@ const styles = StyleSheet.create({
         elevation: 4,
         marginTop: 4,
     },
-    loginButtonText: { color: '#FFFFFF', fontWeight: 'bold', fontSize: 16, letterSpacing: 1 },
+    loginButtonText: { color: Colors.white, fontWeight: '600', fontSize: 16, letterSpacing: 0.2 },
+    // Secondary action: quiet outline so "Log in" stays the one clear primary.
     switchButton: {
-        backgroundColor: '#95C27E',
+        backgroundColor: 'transparent',
         borderRadius: 26,
-        paddingVertical: 14,
+        borderWidth: 1.5,
+        borderColor: Colors.primaryLight,
+        paddingVertical: 13,
         alignItems: 'center',
-        shadowColor: '#95C27E',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 5,
-        elevation: 4,
     },
-    switchText: { color: '#FFFFFF', fontWeight: 'bold', fontSize: 16, letterSpacing: 1 },
+    switchText: { color: Colors.primary, fontWeight: '600', fontSize: 16, letterSpacing: 0.2 },
     devReplayButton: { alignItems: 'center', paddingVertical: 10, marginTop: 2 },
-    devReplayText: { fontSize: 12, fontWeight: '600', color: '#90A4AE' },
+    devReplayText: { fontSize: 12, fontWeight: '600', color: Colors.textMuted },
 });

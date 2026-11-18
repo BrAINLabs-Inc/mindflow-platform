@@ -2,11 +2,11 @@ import { StyleSheet } from 'react-native';
 import { Colors } from '../../constants/colors';
 import { cardShadow } from '../../styles/shared';
 
-// Light blue identity for the whole About Me flow (matches the intro/wizard
-// panel's #E3F2FD tone) instead of the app's default sage green.
-export const ABOUT_ME_ACCENT = '#3B82F6';
-export const ABOUT_ME_ACCENT_TINT = '#E8F1FE';
-export const ABOUT_ME_PANEL_BG = '#E3F2FD';
+// Calm dusty-blue identity for the whole About Me flow, from the shared palette
+// (same tone as Weekly Whispers) so it reads as its own section without clashing.
+export const ABOUT_ME_ACCENT = Colors.blue;
+export const ABOUT_ME_ACCENT_TINT = Colors.blueTint;
+export const ABOUT_ME_PANEL_BG = Colors.surfaceMuted;
 
 export interface AboutMeData {
     university_id: string;
@@ -145,14 +145,14 @@ export const panelStyles = StyleSheet.create({
         fontSize: 13,
         fontWeight: '600',
         color: Colors.textSecondary,
-        letterSpacing: 2,
+        letterSpacing: 0.2,
         marginBottom: 2,
     },
     introPanelSubtitle: {
         fontSize: 17,
         fontWeight: 'bold',
         color: Colors.textPrimary,
-        letterSpacing: 1,
+        letterSpacing: 0.2,
         marginBottom: 20,
     },
     introCard: {

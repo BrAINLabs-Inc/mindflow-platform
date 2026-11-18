@@ -21,7 +21,7 @@ import { LineChart } from 'react-native-chart-kit';
 
 
 
-const JOURNEY_ACCENT = '#6366F1';
+const JOURNEY_ACCENT = Colors.primary;
 const ENTRY_DISPLAY_LIMIT = 15;
 
 const { width } = Dimensions.get('window');
@@ -41,6 +41,11 @@ interface QuestionnaireResponse {
 }
 
 // --- Helper Functions ---
+const formatChartDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return `${date.getDate()}/${date.getMonth() + 1}`;
+};
+
 const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -198,7 +203,8 @@ export default function JourneyScreen() {
         if (recent.length === 0) return { labels: [], datasets: [{ data: [] }] };
 
         return {
-            labels: recent.map(d => formatDate(d.created_at)),
+            // Compact day/month labels: seven "Nov 12" labels overlap at phone width.
+            labels: recent.map(d => formatChartDate(d.created_at)),
             datasets: [{
                 data: recent.map(d =>
                     metric === 'stress' ? d.stress_level :
@@ -239,7 +245,7 @@ export default function JourneyScreen() {
                     backgroundGradientTo: Colors.surface,
                     decimalPlaces: 0,
                     color: (opacity = 1) => color,
-                    labelColor: (opacity = 1) => `rgba(100, 116, 139, ${opacity})`,
+                    labelColor: (opacity = 1) => `rgba(95, 107, 102, ${opacity})`, // Colors.textSecondary
                     propsForBackgroundLines: { stroke: Colors.surfaceMuted },
                     style: { borderRadius: 16 },
                     propsForDots: { r: '4', strokeWidth: '2', stroke: color },
@@ -253,8 +259,8 @@ export default function JourneyScreen() {
     };
 
     const METRICS: { key: 'stress' | 'sleep' | 'relax'; title: string; color: string; icon: keyof typeof Ionicons.glyphMap }[] = [
-        { key: 'stress', title: 'Stress Levels', color: '#EF4444', icon: 'flame-outline' },
-        { key: 'sleep', title: 'Sleep Quality', color: '#3B82F6', icon: 'moon-outline' },
+        { key: 'stress', title: 'Stress Levels', color: Colors.accent, icon: 'flame-outline' },
+        { key: 'sleep', title: 'Sleep Quality', color: Colors.blue, icon: 'moon-outline' },
         { key: 'relax', title: 'Calm (After Practice)', color: Colors.primary, icon: 'leaf-outline' },
     ];
 

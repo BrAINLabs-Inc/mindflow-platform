@@ -258,8 +258,8 @@ export default function OtpVerificationScreen() {
                     <Animated.View 
                         style={[styles.bottomPanel, panelStyle, { minHeight: height - headerHeight, paddingBottom: insets.bottom }]}
                     >
-                        <Text style={styles.panelLabel}>VERIFICATION</Text>
-                        <Text style={styles.panelTitle}>ENTER CODE</Text>
+                        <Text style={styles.panelLabel}>Verification</Text>
+                        <Text style={styles.panelTitle}>Enter code</Text>
 
                         <Text style={styles.instructionText}>
                             We sent an 8-digit code to:{'\n'}
@@ -317,9 +317,9 @@ export default function OtpVerificationScreen() {
                             disabled={loading || filledCount < CODE_LENGTH}
                         >
                             {loading ? (
-                                <ActivityIndicator color="#FFFFFF" size="small" />
+                                <ActivityIndicator color={Colors.white} size="small" />
                             ) : (
-                                <Text style={styles.buttonText}>VERIFY</Text>
+                                <Text style={styles.buttonText}>Verify</Text>
                             )}
                         </TouchableOpacity>
 
@@ -330,7 +330,7 @@ export default function OtpVerificationScreen() {
                             style={styles.resendButton}
                         >
                             <Text style={[styles.resendText, resendCooldown > 0 && styles.resendDisabled]}>
-                                {resendCooldown > 0 ? `RESEND IN ${resendCooldown}s` : 'RESEND CODE'}
+                                {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend code'}
                             </Text>
                         </TouchableOpacity>
 
@@ -354,7 +354,7 @@ export default function OtpVerificationScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#F6F8F9' },
+    container: { flex: 1, backgroundColor: Colors.background },
     keyboardView: { flex: 1 },
     fixedHeader: {
         position: 'absolute',
@@ -372,7 +372,7 @@ const styles = StyleSheet.create({
     illusContainer: { alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
     // Panel
     bottomPanel: {
-        backgroundColor: '#E3F2FD',
+        backgroundColor: Colors.surfaceMuted,
         width: '100%',
         borderTopLeftRadius: 40,
         borderTopRightRadius: 40,
@@ -380,20 +380,20 @@ const styles = StyleSheet.create({
         paddingBottom: 0,
         paddingHorizontal: 24,
         alignItems: 'center',
-        shadowColor: '#000',
+        shadowColor: Colors.shadow,
         shadowOffset: { width: 0, height: -2 },
         shadowOpacity: 0.05,
         shadowRadius: 5,
         elevation: 10,
         overflow: 'hidden',
     },
-    panelLabel: { fontSize: 12, fontWeight: '600', color: '#636E72', letterSpacing: 2, marginBottom: 4 },
-    panelTitle: { fontSize: 18, fontWeight: 'bold', color: '#2D3436', letterSpacing: 1, marginBottom: 12 },
+    panelLabel: { fontSize: 12, fontWeight: '600', color: Colors.textSecondary, letterSpacing: 0.2, marginBottom: 4 },
+    panelTitle: { fontSize: 18, fontWeight: 'bold', color: Colors.textPrimary, letterSpacing: 0.2, marginBottom: 12 },
     instructionText: {
-        fontSize: 13, color: '#636E72',
+        fontSize: 13, color: Colors.textSecondary,
         textAlign: 'center', marginBottom: 20, lineHeight: 22,
     },
-    emailText: { fontWeight: 'bold', color: '#2D3436' },
+    emailText: { fontWeight: 'bold', color: Colors.textPrimary },
     // Digit boxes
     boxRow: {
         flexDirection: 'row',
@@ -407,19 +407,19 @@ const styles = StyleSheet.create({
         height: BOX_H,
         borderRadius: 10,
         borderWidth: 1.5,
-        borderColor: '#CBD5E0',
-        backgroundColor: '#FFFFFF',
+        borderColor: Colors.border,
+        backgroundColor: Colors.white,
         textAlign: 'center',
         textAlignVertical: 'center',
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#2D3436',
+        color: Colors.textPrimary,
         includeFontPadding: false,
         padding: 0,
     },
     boxFilled: {
         borderColor: Colors.primary,
-        backgroundColor: '#F0FFF4',
+        backgroundColor: Colors.primaryTint,
     },
     boxFocused: {
         borderColor: Colors.primary,
@@ -436,14 +436,14 @@ const styles = StyleSheet.create({
         marginBottom: 18,
         paddingHorizontal: 2,
     },
-    progressText: { fontSize: 11, color: '#90A4AE' },
+    progressText: { fontSize: 11, color: Colors.textMuted },
     clearButton: {
         paddingVertical: 4,
         paddingHorizontal: 10,
         borderRadius: 12,
-        backgroundColor: '#FEE2E2',
+        backgroundColor: Colors.errorTint,
     },
-    clearText: { fontSize: 11, color: '#EF5350', fontWeight: '700' },
+    clearText: { fontSize: 11, color: Colors.error, fontWeight: '700' },
     // Buttons
     verifyButton: {
         backgroundColor: Colors.primary,
@@ -458,8 +458,8 @@ const styles = StyleSheet.create({
         elevation: 4,
     },
     verifyButtonDisabled: { opacity: 0.55 },
-    buttonText: { color: '#FFFFFF', fontWeight: 'bold', fontSize: 16, letterSpacing: 1 },
+    buttonText: { color: Colors.white, fontWeight: 'bold', fontSize: 16, letterSpacing: 0.2 },
     resendButton: { paddingVertical: 14, alignItems: 'center' },
-    resendText: { color: '#95C27E', fontWeight: '600', fontSize: 14, letterSpacing: 0.5 },
-    resendDisabled: { color: '#B2BEC3' },
+    resendText: { color: Colors.primarySoft, fontWeight: '600', fontSize: 14, letterSpacing: 0.5 },
+    resendDisabled: { color: Colors.textMuted },
 });

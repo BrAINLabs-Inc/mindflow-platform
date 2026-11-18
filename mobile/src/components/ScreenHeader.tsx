@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/colors';
+import { Typography } from '../constants/theme';
 
 interface ScreenHeaderProps {
     title: string;
@@ -56,16 +57,16 @@ export function ScreenHeader({ title, subtitle, onBack }: ScreenHeaderProps) {
 
 const styles = StyleSheet.create({
     // Tab-screen variant
-    container: { paddingVertical: 12, paddingHorizontal: 24 },
-    title: { fontSize: 28, fontWeight: '800', color: Colors.textPrimary, marginBottom: 4 },
-    subtitle: { fontSize: 15, color: Colors.textSecondary },
+    container: { paddingTop: 12, paddingBottom: 8, paddingHorizontal: 20 },
+    title: { ...Typography.display, marginBottom: 2 },
+    subtitle: { ...Typography.body },
 
     // Back-button (pushed-screen) variant
     backHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 14 },
     backButton: {
         width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center',
         backgroundColor: Colors.surface,
-        shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 5, elevation: 2,
+        shadowColor: Colors.shadow, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 5, elevation: 2,
     },
     backTitleBlock: { flex: 1, alignItems: 'center' },
     backTitle: { fontSize: 20, fontWeight: '700', color: Colors.textPrimary },

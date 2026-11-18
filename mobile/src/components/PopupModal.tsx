@@ -39,15 +39,15 @@ export const PopupModal = ({ visible, type, title, message, buttonText = 'OK', o
 
     const getIconAndColors = () => {
         const primaryColor = themeColor || Colors.primary;
-        let lightBg = '#E6F4EA';
-        if (themeColor === '#E07A5F') { // Stress Snapshot
-            lightBg = '#FFF4F2';
-        } else if (themeColor === '#0D9488') { // Mindful Mirror
-            lightBg = '#F0FDFA';
-        } else if (themeColor === '#D97706') { // Daily Sliders
-            lightBg = '#FFF9F0';
-        } else if (themeColor === '#6366F1') { // Weekly Whispers
-            lightBg = '#EEF2FF';
+        let lightBg = Colors.primaryTint;
+        if (themeColor === Colors.accent) { // Stress Snapshot
+            lightBg = Colors.errorTint;
+        } else if (themeColor === Colors.sea) { // Mindful Mirror
+            lightBg = Colors.seaTint;
+        } else if (themeColor === Colors.accent) { // Daily Sliders
+            lightBg = Colors.accentTint;
+        } else if (themeColor === Colors.plum) { // Weekly Whispers
+            lightBg = Colors.plumTint;
         } else if (themeColor) {
             lightBg = `${themeColor}15`;
         }
@@ -56,12 +56,12 @@ export const PopupModal = ({ visible, type, title, message, buttonText = 'OK', o
             case 'success':
                 return { icon: 'checkmark-circle', color: primaryColor, bgColor: lightBg };
             case 'error':
-                return { icon: 'close-circle', color: '#EF4444', bgColor: '#FEE2E2' };
+                return { icon: 'close-circle', color: Colors.error, bgColor: Colors.errorTint };
             case 'warning':
-                return { icon: 'warning', color: '#F59E0B', bgColor: '#FEF3C7' };
+                return { icon: 'warning', color: Colors.accent, bgColor: Colors.accentTint };
             case 'info':
             default:
-                return { icon: 'information-circle', color: '#8B5CF6', bgColor: '#EDE9FE' };
+                return { icon: 'information-circle', color: Colors.plum, bgColor: Colors.plumTint };
         }
     };
 
@@ -112,13 +112,13 @@ const popupStyles = StyleSheet.create({
         padding: 32,
     },
     container: {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: Colors.white,
         borderRadius: 24,
         padding: 32,
         width: '100%',
         maxWidth: 340,
         alignItems: 'center',
-        shadowColor: '#000',
+        shadowColor: Colors.shadow,
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.25,
         shadowRadius: 20,
@@ -135,13 +135,13 @@ const popupStyles = StyleSheet.create({
     title: {
         fontSize: 22,
         fontWeight: '700',
-        color: '#1E293B',
+        color: Colors.textPrimary,
         marginBottom: 12,
         textAlign: 'center',
     },
     message: {
         fontSize: 15,
-        color: '#64748B',
+        color: Colors.textSecondary,
         textAlign: 'center',
         lineHeight: 22,
         marginBottom: 28,
@@ -155,6 +155,6 @@ const popupStyles = StyleSheet.create({
     buttonText: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#FFFFFF',
+        color: Colors.white,
     },
 });

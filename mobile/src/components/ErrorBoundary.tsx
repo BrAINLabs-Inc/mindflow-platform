@@ -49,28 +49,28 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         padding: 24,
-        backgroundColor: Colors.background ?? '#fff',
+        backgroundColor: Colors.background ?? Colors.white,
     },
     title: {
         fontSize: 20,
         fontWeight: '700',
         marginBottom: 8,
-        color: '#111',
+        color: Colors.textPrimary,
     },
     message: {
         fontSize: 15,
-        color: '#666',
+        color: Colors.textSecondary,
         textAlign: 'center',
         marginBottom: 24,
     },
     button: {
-        backgroundColor: Colors.primary ?? '#2D6A4F',
+        backgroundColor: Colors.primary ?? Colors.primary,
         paddingHorizontal: 24,
         paddingVertical: 12,
         borderRadius: 8,
     },
     buttonText: {
-        color: '#fff',
+        color: Colors.white,
         fontWeight: '600',
     },
 });

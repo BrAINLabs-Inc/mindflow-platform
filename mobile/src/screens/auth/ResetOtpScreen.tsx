@@ -260,8 +260,8 @@ export default function ResetOtpScreen() {
                     <Animated.View
                         style={[styles.bottomPanel, panelStyle, { minHeight: height - headerHeight, paddingBottom: insets.bottom }]}
                     >
-                        <Text style={styles.panelLabel}>VERIFICATION</Text>
-                        <Text style={styles.panelTitle}>RESET PASSWORD</Text>
+                        <Text style={styles.panelLabel}>Verification</Text>
+                        <Text style={styles.panelTitle}>Reset password</Text>
 
                         <Text style={styles.instructionText}>
                             We sent an 8-digit code to:{'\n'}
@@ -314,7 +314,7 @@ export default function ResetOtpScreen() {
                             <TextInput
                                 style={[styles.input, { flex: 1 }]}
                                 placeholder="New Password"
-                                placeholderTextColor="#90A4AE"
+                                placeholderTextColor={Colors.textMuted}
                                 value={newPassword}
                                 onChangeText={setNewPassword}
                                 secureTextEntry={!showNew}
@@ -322,7 +322,7 @@ export default function ResetOtpScreen() {
                                 onFocus={() => handleFocus(320)}
                             />
                             <TouchableOpacity onPress={() => setShowNew(p => !p)} style={{ padding: 4 }}>
-                                <Ionicons name={showNew ? 'eye-off-outline' : 'eye-outline'} size={22} color="#90A4AE" />
+                                <Ionicons name={showNew ? 'eye-off-outline' : 'eye-outline'} size={22} color={Colors.textMuted} />
                             </TouchableOpacity>
                         </View>
 
@@ -330,7 +330,7 @@ export default function ResetOtpScreen() {
                             <View style={styles.strengthRow}>
                                 <View style={styles.strengthBars}>
                                     {([1, 2, 3, 4] as StrengthLevel[]).map(l => (
-                                        <View key={l} style={[styles.strengthBar, { backgroundColor: strength >= l ? STRENGTH_COLOR[strength] : '#E0E6ED' }]} />
+                                        <View key={l} style={[styles.strengthBar, { backgroundColor: strength >= l ? STRENGTH_COLOR[strength] : Colors.border }]} />
                                     ))}
                                 </View>
                                 {strength > 0 && (
@@ -345,7 +345,7 @@ export default function ResetOtpScreen() {
                             <TextInput
                                 style={[styles.input, { flex: 1 }]}
                                 placeholder="Confirm New Password"
-                                placeholderTextColor="#90A4AE"
+                                placeholderTextColor={Colors.textMuted}
                                 value={confirmPassword}
                                 onChangeText={setConfirmPassword}
                                 secureTextEntry={!showConfirm}
@@ -355,11 +355,11 @@ export default function ResetOtpScreen() {
                                 onSubmitEditing={handleConfirmReset}
                             />
                             <TouchableOpacity onPress={() => setShowConfirm(p => !p)} style={{ padding: 4 }}>
-                                <Ionicons name={showConfirm ? 'eye-off-outline' : 'eye-outline'} size={22} color="#90A4AE" />
+                                <Ionicons name={showConfirm ? 'eye-off-outline' : 'eye-outline'} size={22} color={Colors.textMuted} />
                             </TouchableOpacity>
                         </View>
                         {confirmPassword.length > 0 && (
-                            <Text style={[styles.matchText, { color: newPassword === confirmPassword ? '#2E7D32' : '#EF5350' }]}>
+                            <Text style={[styles.matchText, { color: newPassword === confirmPassword ? Colors.primary : Colors.error }]}>
                                 {newPassword === confirmPassword ? '✓ Passwords match' : '✗ Passwords do not match'}
                             </Text>
                         )}
@@ -370,9 +370,9 @@ export default function ResetOtpScreen() {
                             disabled={loading || filledCount < CODE_LENGTH}
                         >
                             {loading ? (
-                                <ActivityIndicator color="#FFFFFF" size="small" />
+                                <ActivityIndicator color={Colors.white} size="small" />
                             ) : (
-                                <Text style={styles.buttonText}>RESET PASSWORD</Text>
+                                <Text style={styles.buttonText}>Reset password</Text>
                             )}
                         </TouchableOpacity>
 
@@ -382,7 +382,7 @@ export default function ResetOtpScreen() {
                             style={styles.resendButton}
                         >
                             <Text style={[styles.resendText, resendCooldown > 0 && styles.resendDisabled]}>
-                                {resendCooldown > 0 ? `RESEND IN ${resendCooldown}s` : 'RESEND CODE'}
+                                {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend code'}
                             </Text>
                         </TouchableOpacity>
 
@@ -404,7 +404,7 @@ export default function ResetOtpScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#F6F8F9' },
+    container: { flex: 1, backgroundColor: Colors.background },
     keyboardView: { flex: 1 },
     fixedHeader: {
         position: 'absolute',
@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
     },
     illusContainer: { alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
     bottomPanel: {
-        backgroundColor: '#E3F2FD',
+        backgroundColor: Colors.surfaceMuted,
         width: '100%',
         borderTopLeftRadius: 40,
         borderTopRightRadius: 40,
@@ -428,20 +428,20 @@ const styles = StyleSheet.create({
         paddingBottom: 0,
         paddingHorizontal: 24,
         alignItems: 'center',
-        shadowColor: '#000',
+        shadowColor: Colors.shadow,
         shadowOffset: { width: 0, height: -2 },
         shadowOpacity: 0.05,
         shadowRadius: 5,
         elevation: 10,
         overflow: 'hidden',
     },
-    panelLabel: { fontSize: 12, fontWeight: '600', color: '#636E72', letterSpacing: 2, marginBottom: 4 },
-    panelTitle: { fontSize: 18, fontWeight: 'bold', color: '#2D3436', letterSpacing: 1, marginBottom: 12 },
+    panelLabel: { fontSize: 12, fontWeight: '600', color: Colors.textSecondary, letterSpacing: 0.2, marginBottom: 4 },
+    panelTitle: { fontSize: 18, fontWeight: 'bold', color: Colors.textPrimary, letterSpacing: 0.2, marginBottom: 12 },
     instructionText: {
-        fontSize: 13, color: '#636E72',
+        fontSize: 13, color: Colors.textSecondary,
         textAlign: 'center', marginBottom: 20, lineHeight: 22,
     },
-    emailText: { fontWeight: 'bold', color: '#2D3436' },
+    emailText: { fontWeight: 'bold', color: Colors.textPrimary },
     boxRow: {
         flexDirection: 'row',
         gap: 6,
@@ -454,19 +454,19 @@ const styles = StyleSheet.create({
         height: BOX_H,
         borderRadius: 10,
         borderWidth: 1.5,
-        borderColor: '#CBD5E0',
-        backgroundColor: '#FFFFFF',
+        borderColor: Colors.border,
+        backgroundColor: Colors.white,
         textAlign: 'center',
         textAlignVertical: 'center',
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#2D3436',
+        color: Colors.textPrimary,
         includeFontPadding: false,
         padding: 0,
     },
     boxFilled: {
         borderColor: Colors.primary,
-        backgroundColor: '#F0FFF4',
+        backgroundColor: Colors.primaryTint,
     },
     boxFocused: {
         borderColor: Colors.primary,
@@ -482,20 +482,20 @@ const styles = StyleSheet.create({
         marginBottom: 14,
         paddingHorizontal: 2,
     },
-    progressText: { fontSize: 11, color: '#90A4AE' },
+    progressText: { fontSize: 11, color: Colors.textMuted },
     clearButton: {
         paddingVertical: 4,
         paddingHorizontal: 10,
         borderRadius: 12,
-        backgroundColor: '#FEE2E2',
+        backgroundColor: Colors.errorTint,
     },
-    clearText: { fontSize: 11, color: '#EF5350', fontWeight: '700' },
+    clearText: { fontSize: 11, color: Colors.error, fontWeight: '700' },
     inputWrapper: {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: Colors.white,
         borderRadius: 30,
         paddingHorizontal: 20,
         paddingVertical: 12,
-        shadowColor: '#000',
+        shadowColor: Colors.shadow,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 3,
@@ -503,7 +503,7 @@ const styles = StyleSheet.create({
         width: '100%',
         marginBottom: 10,
     },
-    input: { fontSize: 16, color: '#2D3436' },
+    input: { fontSize: 16, color: Colors.textPrimary },
     strengthRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: -4, marginBottom: 10, width: '100%', paddingHorizontal: 4 },
     strengthBars: { flexDirection: 'row', gap: 4, flex: 1 },
     strengthBar: { flex: 1, height: 4, borderRadius: 2 },
@@ -523,8 +523,8 @@ const styles = StyleSheet.create({
         elevation: 4,
     },
     verifyButtonDisabled: { opacity: 0.55 },
-    buttonText: { color: '#FFFFFF', fontWeight: 'bold', fontSize: 16, letterSpacing: 1 },
+    buttonText: { color: Colors.white, fontWeight: 'bold', fontSize: 16, letterSpacing: 0.2 },
     resendButton: { paddingVertical: 14, alignItems: 'center' },
-    resendText: { color: '#95C27E', fontWeight: '600', fontSize: 14, letterSpacing: 0.5 },
-    resendDisabled: { color: '#B2BEC3' },
+    resendText: { color: Colors.primarySoft, fontWeight: '600', fontSize: 14, letterSpacing: 0.5 },
+    resendDisabled: { color: Colors.textMuted },
 });

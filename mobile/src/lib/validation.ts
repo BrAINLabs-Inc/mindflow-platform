@@ -1,3 +1,4 @@
+import { Colors } from '../constants/colors';
 // Shared auth-form validation — single source of truth for email format and password
 // strength scoring, used by Signup, Login/ForgotPassword, and the reset-OTP screen.
 export const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -16,5 +17,5 @@ export function getStrength(pwd: string): StrengthLevel {
 
 export const STRENGTH_LABEL: Record<StrengthLevel, string> = { 0: '', 1: 'Weak', 2: 'Fair', 3: 'Good', 4: 'Strong' };
 export const STRENGTH_COLOR: Record<StrengthLevel, string> = {
-    0: '#E0E6ED', 1: '#EF5350', 2: '#FFA726', 3: '#66BB6A', 4: '#2E7D32',
+    0: Colors.border, 1: Colors.error, 2: Colors.ochre, 3: Colors.primarySoft, 4: Colors.primary,
 };

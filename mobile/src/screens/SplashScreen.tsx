@@ -12,6 +12,7 @@ import Svg, { Path, Defs, LinearGradient as SvgGradient, Stop } from 'react-nati
 import { RootStackParamList } from '../types/navigation';
 import { getPostAuthRoute } from '../lib/postAuthRoute';
 import { getAuthToken, removeAuthToken, apiFetch } from '../lib/apiClient';
+import { Colors } from '../constants/colors';
 
 // Pre-scaled ~512px/200px derivatives for inline rendering (52-180pt) — the 1024px
 // masters are reserved for app.json's icon/splash/adaptive-icon config, which needs
@@ -25,14 +26,14 @@ const BrainLabsLogo = require('../../assets/brainlabs_logo-display.png');
 const SLIITLogo = require('../../assets/Logo_SLIIT.png');
 
 const P = {
-    primary:  '#7EA889',
-    mint:     '#7FD9D1',
-    green2:   '#98C67A',
-    aqua:     '#63C9D9',
-    wave1:    '#A7D7C5',
-    charcoal: '#3A3A3A',
-    textGray: '#7A8285',
-    divider:  '#E2E7EA',
+    primary:  Colors.primary,
+    mint:     Colors.sea,
+    green2:   Colors.primarySoft,
+    aqua:     Colors.sea,
+    wave1:    Colors.primaryTint,
+    charcoal: Colors.textPrimary,
+    textGray: Colors.textSecondary,
+    divider:  Colors.border,
 };
 
 const { width: SW } = Dimensions.get('window');
@@ -204,7 +205,7 @@ export default function SplashScreen() {
     const partnerStyle = useAnimatedStyle(() => ({ opacity: partnerOpacity.value, transform: [{ translateY: partnerY.value }] }));
 
     return (
-        <LinearGradient colors={['#FFFFFF', '#F7FBF9', '#EEF8F7', '#EAF4FF']} style={styles.container} start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }}>
+        <LinearGradient colors={[Colors.background, Colors.primaryWash, Colors.primaryTint]} style={styles.container} start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }}>
             <StatusBar style="dark" />
 
             {/* Birds + leaves in upper section */}
@@ -274,11 +275,11 @@ const styles = StyleSheet.create({
     icon: { width: '100%', height: '100%' },
     textBlock: { alignItems: 'center' },
     titleRow: { flexDirection: 'row', marginBottom: 8 },
-    titleThin: { fontSize: 34, fontWeight: '300', color: P.charcoal, letterSpacing: 1.5 },
-    titleBold: { fontSize: 34, fontWeight: '800', color: P.primary, letterSpacing: 1.5 },
+    titleThin: { fontSize: 34, fontWeight: '300', color: P.charcoal, letterSpacing: 0.2 },
+    titleBold: { fontSize: 34, fontWeight: '800', color: P.primary, letterSpacing: 0.2 },
     taglineRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 },
     taglineDot: { width: 4, height: 4, borderRadius: 2, backgroundColor: P.mint, opacity: 0.7 },
-    tagline: { fontSize: 11, color: P.textGray, letterSpacing: 3, textTransform: 'uppercase', fontWeight: '600' },
+    tagline: { fontSize: 11, color: P.textGray, letterSpacing: 0.2, fontWeight: '600' },
     pulseWrap: { marginTop: 2 },
     waveContainer: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 220 },
     footer: { position: 'absolute', alignItems: 'center', gap: 14, width: '80%' },
@@ -287,7 +288,7 @@ const styles = StyleSheet.create({
     footerItem: { flexDirection: 'row', alignItems: 'center', gap: 10 },
     brandLogo: { width: 40, height: 40 },
     sliitLogo:  { width: 52, height: 52 },
-    footerRole: { fontSize: 9, color: P.textGray, fontWeight: '600', letterSpacing: 1, textTransform: 'uppercase' },
+    footerRole: { fontSize: 9, color: P.textGray, fontWeight: '600', letterSpacing: 0.2 },
     footerName: { fontSize: 13, color: P.charcoal, fontWeight: '700', letterSpacing: 0.3 },
     footerSep:  { width: 1, height: 40, backgroundColor: P.divider },
 });

@@ -101,7 +101,7 @@ export default function ProfileScreen() {
                                     <Text style={styles.infoValue}>{profileData.research_id}</Text>
                                 ) : (
                                     <View style={styles.pendingRow}>
-                                        <Ionicons name="time-outline" size={13} color="#D97706" />
+                                        <Ionicons name="time-outline" size={13} color={Colors.accent} />
                                         <Text style={styles.pendingText}>Researchers will add you shortly</Text>
                                     </View>
                                 )}
@@ -124,7 +124,7 @@ export default function ProfileScreen() {
                         activeOpacity={0.7}
                     >
                         <View style={styles.actionLeft}>
-                            <View style={[styles.iconCircle, { backgroundColor: '#E6F4EA' }]}>
+                            <View style={[styles.iconCircle, { backgroundColor: Colors.primaryTint }]}>
                                 <Ionicons name="document-text-outline" size={24} color={Colors.primary} />
                             </View>
                             <View>
@@ -146,7 +146,7 @@ export default function ProfileScreen() {
                         activeOpacity={0.7}
                     >
                         <View style={styles.actionLeft}>
-                            <View style={[styles.iconCircle, { backgroundColor: '#E6F4EA' }]}>
+                            <View style={[styles.iconCircle, { backgroundColor: Colors.primaryTint }]}>
                                 <Ionicons name="lock-closed-outline" size={24} color={Colors.primary} />
                             </View>
                             <View>
@@ -163,15 +163,15 @@ export default function ProfileScreen() {
                         activeOpacity={0.7}
                     >
                         <View style={styles.actionLeft}>
-                            <View style={[styles.iconCircle, { backgroundColor: '#FEE2E2' }]}>
-                                <Ionicons name="log-out-outline" size={24} color="#EF4444" />
+                            <View style={[styles.iconCircle, { backgroundColor: Colors.errorTint }]}>
+                                <Ionicons name="log-out-outline" size={24} color={Colors.error} />
                             </View>
                             <View>
                                 <Text style={styles.dangerText}>Sign Out from Device</Text>
                                 <Text style={styles.dangerSubText}>Log out safely</Text>
                             </View>
                         </View>
-                        <Ionicons name="chevron-forward" size={20} color="#EF4444" />
+                        <Ionicons name="chevron-forward" size={20} color={Colors.error} />
                     </TouchableOpacity>
                 </View>
             </ScrollView>
@@ -181,7 +181,7 @@ export default function ProfileScreen() {
                 <View style={styles.modalOverlay}>
                     <View style={styles.alertModal}>
                         <View style={styles.alertIconCircle}>
-                            <Ionicons name="log-out" size={32} color="#EF4444" />
+                            <Ionicons name="log-out" size={32} color={Colors.error} />
                         </View>
                         <Text style={styles.alertTitle}>Sign Out?</Text>
                         <Text style={styles.alertMessage}>You will need to log in again to access your account.</Text>
@@ -213,13 +213,13 @@ const styles = StyleSheet.create({
     },
     avatarCircle: {
         width: 84, height: 84, borderRadius: 42, backgroundColor: Colors.primaryTint,
-        justifyContent: 'center', alignItems: 'center', marginBottom: 14, borderWidth: 3, borderColor: '#C2E7CD',
+        justifyContent: 'center', alignItems: 'center', marginBottom: 14, borderWidth: 3, borderColor: Colors.primaryTint,
     },
     userName: { fontSize: 22, fontWeight: '800', color: Colors.textPrimary },
     userEmail: { fontSize: 14, color: Colors.primary, marginTop: 4, fontWeight: '600' },
 
     section: { marginTop: 24, paddingHorizontal: 24 },
-    sectionTitle: { fontSize: 12, fontWeight: '800', color: Colors.textMuted, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12, paddingLeft: 4 },
+    sectionTitle: { fontSize: 12, fontWeight: '800', color: Colors.textMuted, letterSpacing: 0.2, marginBottom: 12, paddingLeft: 4 },
 
     infoCard: {
         backgroundColor: Colors.surface, borderRadius: 24, paddingHorizontal: 20, paddingVertical: 8,
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     infoLabel: { fontSize: 12, color: Colors.textMuted, fontWeight: '600', marginBottom: 2 },
     infoValue: { fontSize: 15, color: Colors.textPrimary, fontWeight: '700' },
     pendingRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 1 },
-    pendingText: { fontSize: 13, color: '#D97706', fontWeight: '600', fontStyle: 'italic' },
+    pendingText: { fontSize: 13, color: Colors.accent, fontWeight: '600', fontStyle: 'italic' },
 
     actionButton: {
         backgroundColor: Colors.surface, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
@@ -242,22 +242,22 @@ const styles = StyleSheet.create({
     iconCircle: { width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center' },
     actionText: { fontSize: 15, fontWeight: '700', color: Colors.textPrimary },
     actionSubtext: { fontSize: 12, color: Colors.textSecondary, marginTop: 2 },
-    dangerButton: { marginTop: 0, borderWidth: 1.5, borderColor: '#FEE2E2' },
-    dangerText: { fontSize: 15, fontWeight: '700', color: '#EF4444' },
-    dangerSubText: { fontSize: 12, color: '#F87171', marginTop: 2 },
+    dangerButton: { marginTop: 0, borderWidth: 1.5, borderColor: Colors.errorTint },
+    dangerText: { fontSize: 15, fontWeight: '700', color: Colors.error },
+    dangerSubText: { fontSize: 12, color: Colors.error, marginTop: 2 },
 
     // Sign-out modal
     modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
     alertModal: {
         backgroundColor: Colors.surface, borderRadius: 30, padding: 28, width: '85%', alignItems: 'center',
-        shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.15, shadowRadius: 24, elevation: 10,
+        shadowColor: Colors.shadow, shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.15, shadowRadius: 24, elevation: 10,
     },
-    alertIconCircle: { width: 64, height: 64, borderRadius: 32, backgroundColor: '#FEF2F2', justifyContent: 'center', alignItems: 'center', marginBottom: 16 },
+    alertIconCircle: { width: 64, height: 64, borderRadius: 32, backgroundColor: Colors.errorTint, justifyContent: 'center', alignItems: 'center', marginBottom: 16 },
     alertTitle: { fontSize: 20, fontWeight: '800', color: Colors.textPrimary, marginBottom: 8 },
     alertMessage: { fontSize: 15, color: Colors.textSecondary, textAlign: 'center', marginBottom: 28, lineHeight: 22, fontWeight: '500' },
     alertActions: { flexDirection: 'row', gap: 12, width: '100%' },
     alertCancel: { flex: 1, paddingVertical: 16, backgroundColor: Colors.surfaceMuted, borderRadius: 30, alignItems: 'center' },
     alertCancelText: { fontSize: 16, fontWeight: '700', color: Colors.textSecondary },
-    alertConfirm: { flex: 1, paddingVertical: 16, backgroundColor: '#EF4444', borderRadius: 30, alignItems: 'center' },
+    alertConfirm: { flex: 1, paddingVertical: 16, backgroundColor: Colors.error, borderRadius: 30, alignItems: 'center' },
     alertConfirmText: { fontSize: 16, fontWeight: '700', color: Colors.surface },
 });

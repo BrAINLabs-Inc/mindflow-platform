@@ -27,11 +27,12 @@ import { PopupModal } from '../../components/PopupModal';
 import { LeavesDecoration } from '../../components/LeavesDecoration';
 import { PanelWave } from '../../components/PanelWave';
 import { FocusRingIcons } from '../../components/ScaleIcons';
+// This activity's tone from the shared palette (see Colors.tasks).
 const Colors = {
     ...GlobalColors,
-    primary: '#0D9488',
+    primary: GlobalColors.tasks.mindful.ink,
 };
-const THEME_BG = '#F0FDFA';
+const THEME_BG = GlobalColors.tasks.mindful.tint;
 
 const { width } = Dimensions.get('window');
 
@@ -225,7 +226,7 @@ export default function MindfulMirrorScreen() {
                 message: 'You have successfully completed the Mindful Mirror. See you in 1 month!',
                 buttonText: 'Back to Dashboard',
                 themeColor: Colors.primary,
-                themeBgGrad: [THEME_BG, '#E6F2F0', '#FFFFFF']
+                themeBgGrad: [THEME_BG, Colors.seaTint, Colors.white]
             });
 
         } catch (error: any) {
@@ -253,7 +254,7 @@ export default function MindfulMirrorScreen() {
                 <LeavesDecoration width={width} height={width} color={Colors.primary} />
                 <View style={styles.header}>
                     <TouchableOpacity onPress={() => navigation.navigate('MainTabs')} style={styles.backButton}>
-                        <Ionicons name="arrow-back" size={24} color="#1E293B" />
+                        <Ionicons name="arrow-back" size={24} color={Colors.textPrimary} />
                     </TouchableOpacity>
                     <Text style={styles.title}>Mindful Mirror</Text>
                     <View style={{ width: 40 }} />
@@ -302,7 +303,7 @@ export default function MindfulMirrorScreen() {
                 />
                 <View style={styles.header}>
                     <TouchableOpacity onPress={() => navigation.navigate('MainTabs')} style={styles.backButton}>
-                        <Ionicons name="arrow-back" size={24} color="#1E293B" />
+                        <Ionicons name="arrow-back" size={24} color={Colors.textPrimary} />
                     </TouchableOpacity>
                     <Text style={styles.title}>Mindful Mirror</Text>
                     <View style={{ width: 40 }} />
@@ -315,8 +316,8 @@ export default function MindfulMirrorScreen() {
                         </View>
 
                         <View style={[styles.introPanel, { paddingBottom: 28 + insets.bottom }]}>
-                            <Text style={styles.introPanelLabel}>FFMQ-15 ASSESSMENT</Text>
-                            <Text style={styles.introPanelHeadline}>SELF-REFLECTION</Text>
+                            <Text style={styles.introPanelLabel}>FFMQ-15 assessment</Text>
+                            <Text style={styles.introPanelHeadline}>Self-reflection</Text>
 
                             <View style={styles.introCard}>
                                 <View style={styles.introIconRow}>
@@ -336,7 +337,7 @@ export default function MindfulMirrorScreen() {
                                 activeOpacity={0.8}
                             >
                                 <Text style={styles.goButtonText}>Start Assessment</Text>
-                                <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
+                                <Ionicons name="arrow-forward" size={20} color={Colors.white} />
                             </TouchableOpacity>
 
                             <PanelWave />
@@ -376,7 +377,7 @@ export default function MindfulMirrorScreen() {
                     }}
                     style={styles.backButton}
                 >
-                    <Ionicons name="arrow-back" size={24} color="#1E293B" />
+                    <Ionicons name="arrow-back" size={24} color={Colors.textPrimary} />
                 </TouchableOpacity>
                 <Text style={styles.title}>Mindful Mirror</Text>
                 <View style={styles.progressBadge}>
@@ -467,7 +468,7 @@ export default function MindfulMirrorScreen() {
                                     activeOpacity={0.7}
                                 >
                                     <Text style={styles.navButtonTextPrimary}>Next</Text>
-                                    <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
+                                    <Ionicons name="arrow-forward" size={20} color={Colors.white} />
                                 </TouchableOpacity>
                             ) : (
                                 <TouchableOpacity
@@ -480,11 +481,11 @@ export default function MindfulMirrorScreen() {
                                     activeOpacity={0.7}
                                 >
                                     {isSubmitting ? (
-                                        <ActivityIndicator color="#FFFFFF" size="small" />
+                                        <ActivityIndicator color={Colors.white} size="small" />
                                     ) : (
                                         <>
                                             <Text style={styles.submitButtonText}>Submit</Text>
-                                            <Ionicons name="checkmark-done" size={20} color="#FFFFFF" />
+                                            <Ionicons name="checkmark-done" size={20} color={Colors.white} />
                                         </>
                                     )}
                                 </TouchableOpacity>
@@ -502,7 +503,7 @@ export default function MindfulMirrorScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F6F8F9', // Soft cream backdrop
+        backgroundColor: Colors.background, // Soft cream backdrop
     },
     centerContainer: {
         flex: 1,
@@ -521,9 +522,9 @@ const styles = StyleSheet.create({
         height: 40,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: Colors.white,
         borderRadius: 20,
-        shadowColor: '#000',
+        shadowColor: Colors.shadow,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 5,
@@ -532,7 +533,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 20,
         fontWeight: '700',
-        color: '#2D3436',
+        color: Colors.textPrimary,
     },
     progressBadge: {
         backgroundColor: THEME_BG,
@@ -552,7 +553,7 @@ const styles = StyleSheet.create({
     },
     progressBarBg: {
         height: 8,
-        backgroundColor: '#E2E8F0',
+        backgroundColor: Colors.border,
         borderRadius: 4,
         width: '100%',
         overflow: 'hidden',
@@ -565,7 +566,7 @@ const styles = StyleSheet.create({
     progressStepText: {
         fontSize: 12,
         fontWeight: '600',
-        color: '#64748B',
+        color: Colors.textSecondary,
         marginTop: 6,
     },
     content: {
@@ -574,14 +575,14 @@ const styles = StyleSheet.create({
     instructionContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: Colors.white,
         paddingHorizontal: 20,
         paddingVertical: 14,
         borderRadius: 20,
         marginBottom: 20,
         borderWidth: 1,
-        borderColor: '#E2E8F0',
-        shadowColor: '#000',
+        borderColor: Colors.border,
+        shadowColor: Colors.shadow,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.02,
         shadowRadius: 6,
@@ -589,7 +590,7 @@ const styles = StyleSheet.create({
     },
     instructionText: {
         fontSize: 14,
-        color: '#475569',
+        color: Colors.textSecondary,
         fontWeight: '600',
         marginLeft: 8,
         flex: 1,
@@ -600,12 +601,12 @@ const styles = StyleSheet.create({
     },
     questionNumberBadge: {
         alignSelf: 'flex-start',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: Colors.white,
         paddingHorizontal: 10,
         paddingVertical: 5,
         borderRadius: 12,
         marginBottom: 10,
-        shadowColor: '#000',
+        shadowColor: Colors.shadow,
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.05,
         shadowRadius: 2,
@@ -615,13 +616,12 @@ const styles = StyleSheet.create({
         fontSize: 10,
         fontWeight: '800',
         color: Colors.primary,
-        textTransform: 'uppercase',
-        letterSpacing: 1,
+        letterSpacing: 0.2,
     },
     questionText: {
         fontSize: 16,
         fontWeight: '700',
-        color: '#1E293B',
+        color: Colors.textPrimary,
         marginBottom: 12,
         lineHeight: 22,
     },
@@ -634,10 +634,10 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: 14,
         borderRadius: 14,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: Colors.white,
         borderWidth: 1.5,
-        borderColor: '#E2E8F0',
-        shadowColor: '#000',
+        borderColor: Colors.border,
+        shadowColor: Colors.shadow,
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.04,
         shadowRadius: 3,
@@ -657,7 +657,7 @@ const styles = StyleSheet.create({
         height: 18,
         borderRadius: 9,
         borderWidth: 2,
-        borderColor: '#94A3B8',
+        borderColor: Colors.textMuted,
         marginRight: 10,
         justifyContent: 'center',
         alignItems: 'center',
@@ -678,12 +678,12 @@ const styles = StyleSheet.create({
     },
     optionText: {
         fontSize: 13.5,
-        color: '#475569',
+        color: Colors.textSecondary,
         flex: 1,
         fontWeight: '500',
     },
     optionTextSelected: {
-        color: '#2D3436',
+        color: Colors.textPrimary,
         fontWeight: '700',
     },
     navigationRow: {
@@ -703,13 +703,13 @@ const styles = StyleSheet.create({
         paddingVertical: 13,
         borderRadius: 30,
         borderWidth: 1.5,
-        borderColor: '#DFE6E9',
-        backgroundColor: '#FFFFFF',
+        borderColor: Colors.border,
+        backgroundColor: Colors.white,
     },
     navButtonTextSecondary: {
         fontSize: 15,
         fontWeight: '600',
-        color: '#636E72',
+        color: Colors.textSecondary,
     },
     navButtonPrimary: {
         flex: 2,
@@ -724,7 +724,7 @@ const styles = StyleSheet.create({
     navButtonTextPrimary: {
         fontSize: 15,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: Colors.white,
     },
     submitButton: {
         flex: 2,
@@ -744,11 +744,11 @@ const styles = StyleSheet.create({
     submitButtonText: {
         fontSize: 15,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: Colors.white,
     },
     navButtonDisabled: {
-        backgroundColor: '#DFE6E9',
-        borderColor: '#DFE6E9',
+        backgroundColor: Colors.border,
+        borderColor: Colors.border,
         opacity: 0.6,
     },
     successContainer: {
@@ -773,13 +773,13 @@ const styles = StyleSheet.create({
     successTitle: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#2D3436',
+        color: Colors.textPrimary,
         marginBottom: 12,
         textAlign: 'center',
     },
     successText: {
         fontSize: 16,
-        color: '#636E72',
+        color: Colors.textSecondary,
         textAlign: 'center',
         lineHeight: 24,
         marginBottom: 24,
@@ -796,7 +796,7 @@ const styles = StyleSheet.create({
         elevation: 2,
     },
     homeButtonText: {
-        color: '#FFFFFF',
+        color: Colors.white,
         fontSize: 16,
         fontWeight: '700',
     },
@@ -827,7 +827,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 24,
         alignItems: 'center',
         overflow: 'hidden',
-        shadowColor: '#000',
+        shadowColor: Colors.shadow,
         shadowOffset: { width: 0, height: -2 },
         shadowOpacity: 0.05,
         shadowRadius: 5,
@@ -836,24 +836,24 @@ const styles = StyleSheet.create({
     introPanelLabel: {
         fontSize: 13,
         fontWeight: '600',
-        color: '#636E72',
-        letterSpacing: 2,
+        color: Colors.textSecondary,
+        letterSpacing: 0.2,
         marginBottom: 2,
     },
     introPanelHeadline: {
         fontSize: 17,
         fontWeight: 'bold',
-        color: '#2D3436',
-        letterSpacing: 1,
+        color: Colors.textPrimary,
+        letterSpacing: 0.2,
         marginBottom: 20,
     },
     introCard: {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: Colors.white,
         borderRadius: 24,
         padding: 24,
         width: '100%',
         marginBottom: 32,
-        shadowColor: '#000',
+        shadowColor: Colors.shadow,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.04,
         shadowRadius: 12,
@@ -876,11 +876,11 @@ const styles = StyleSheet.create({
     introCardTitle: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#2D3436',
+        color: Colors.textPrimary,
     },
     introCardText: {
         fontSize: 14,
-        color: '#636E72',
+        color: Colors.textSecondary,
         lineHeight: 22,
     },
     goButton: {
@@ -904,6 +904,6 @@ const styles = StyleSheet.create({
     goButtonText: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: Colors.white,
     }
 });

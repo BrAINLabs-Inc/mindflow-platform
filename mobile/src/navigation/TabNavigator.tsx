@@ -20,8 +20,8 @@ import { Colors } from '../constants/colors';
 
 const Tab = createBottomTabNavigator();
 
-const ACTIVE_COLOR   = Colors.primary;  // sage green
-const INACTIVE_COLOR = '#AEBBC7';       // cool grey
+const ACTIVE_COLOR   = Colors.primary;   // deep sage
+const INACTIVE_COLOR = Colors.textMuted; // warm grey
 
 const TABS: {
     name: string;
@@ -46,12 +46,12 @@ function TabItem({
     researchGroup: string;
     onPress: () => void;
 }) {
-    const scale  = useRef(new Animated.Value(isFocused ? 1.10 : 1)).current;
+    const scale  = useRef(new Animated.Value(isFocused ? 1.04 : 1)).current;
     const pressO = useRef(new Animated.Value(1)).current;
 
     useEffect(() => {
         Animated.spring(scale, {
-            toValue: isFocused ? 1.10 : 1,
+            toValue: isFocused ? 1.04 : 1,
             useNativeDriver: true,
             damping: 14,
             stiffness: 180,
@@ -65,7 +65,7 @@ function TabItem({
         Animated.spring(pressO, { toValue: 1, useNativeDriver: true, damping: 10, stiffness: 300 }).start();
 
     const color = isFocused
-        ? (researchGroup === 'cg' ? '#D97706' : ACTIVE_COLOR)
+        ? (researchGroup === 'cg' ? Colors.accent : ACTIVE_COLOR)
         : INACTIVE_COLOR;
 
     return (
@@ -79,7 +79,11 @@ function TabItem({
             style={styles.tabItem}
             android_ripple={null}
         >
-            <Animated.View style={{ transform: [{ scale: Animated.multiply(scale, pressO) }] }}>
+            <Animated.View style={[
+                styles.iconPill,
+                isFocused && { backgroundColor: researchGroup === 'cg' ? Colors.accentTint : Colors.primaryTint },
+                { transform: [{ scale: Animated.multiply(scale, pressO) }] },
+            ]}>
                 <tab.Icon
                     width={24}
                     height={24}
@@ -94,7 +98,7 @@ function TabItem({
                     styles.tabLabel,
                     {
                         color,
-                        fontWeight: isFocused ? '700' : '500',
+                        fontWeight: isFocused ? '600' : '500',
                     },
                 ]}
                 numberOfLines={1}
@@ -188,18 +192,18 @@ const styles = StyleSheet.create({
         bottom: 0,
         left: 0,
         right: 0,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: Colors.white,
         // Generous rounded top corners
         borderTopLeftRadius: 32,
         borderTopRightRadius: 32,
-        shadowColor: '#1A2E35',
-        shadowOffset: { width: 0, height: -6 },
-        shadowOpacity: 0.09,
-        shadowRadius: 20,
-        elevation: 18,
+        shadowColor: Colors.shadow,
+        shadowOffset: { width: 0, height: -4 },
+        shadowOpacity: 0.06,
+        shadowRadius: 18,
+        elevation: 12,
         paddingTop: 4,
         borderWidth: 1,
-        borderColor: '#F0F2F5',
+        borderColor: Colors.borderLight,
     },
     barInner: {
         flexDirection: 'row',
@@ -216,6 +220,14 @@ const styles = StyleSheet.create({
         paddingVertical: 6,
         gap: 3,
         minHeight: 56,
+    },
+    // Soft tinted pill behind the active icon (30pt tall, fits within minHeight 56).
+    iconPill: {
+        width: 52,
+        height: 30,
+        borderRadius: 15,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     tabLabel: {
         fontSize: 11,

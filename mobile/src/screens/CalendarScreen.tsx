@@ -22,7 +22,7 @@ import { useTabBarHeight } from '../lib/useTabBarHeight';
 import { StatusBar } from 'expo-status-bar';
 
 
-const CALENDAR_ACCENT = '#0EA5E9';
+const CALENDAR_ACCENT = Colors.primary;
 
 interface CalendarEvent {
     id: number;
@@ -184,7 +184,7 @@ export default function CalendarScreen() {
 
                     {hasMindfulnessSession && (
                         <View style={styles.sessionIndicator}>
-                            <Svg width="10" height="10" viewBox="0 0 24 24" fill="#9C27B0">
+                            <Svg width="10" height="10" viewBox="0 0 24 24" fill={Colors.plum}>
                                 <Circle cx="12" cy="12" r="10" />
                             </Svg>
                         </View>
@@ -275,7 +275,7 @@ export default function CalendarScreen() {
 
                     {upcomingMindfulnessSessions.length === 0 ? (
                         <View style={styles.noEventsContainer}>
-                            <Ionicons name="calendar-outline" size={48} color="#D1D5DB" />
+                            <Ionicons name="calendar-outline" size={48} color={Colors.border} />
                             <Text style={styles.noEventsText}>No upcoming events</Text>
                         </View>
                     ) : (
@@ -290,7 +290,7 @@ export default function CalendarScreen() {
                                         <Ionicons
                                             name={isMindfulness ? "flower-outline" : "calendar-outline"}
                                             size={24}
-                                            color={isMindfulness ? "#9C27B0" : "#0EA5E9"}
+                                            color={isMindfulness ? Colors.plum : Colors.primary}
                                         />
                                     </View>
                                     <View style={styles.eventContent}>
@@ -307,7 +307,7 @@ export default function CalendarScreen() {
                                         {isCompleted ? (
                                             <Ionicons name="checkmark-circle" size={24} color={Colors.primary} />
                                         ) : (
-                                            <Ionicons name="radio-button-off" size={24} color="#F59E0B" />
+                                            <Ionicons name="radio-button-off" size={24} color={Colors.accent} />
                                         )}
                                     </View>
                                 </View>
@@ -437,15 +437,15 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
     mindfulnessDayCell: {
-        backgroundColor: '#F3E8FF',
+        backgroundColor: Colors.plumTint,
         borderRadius: 20,
     },
     mindfulnessDayText: {
-        color: '#9333EA',
+        color: Colors.plum,
         fontWeight: '700',
     },
     hasEventsCell: {
-        backgroundColor: '#E0F2FE',
+        backgroundColor: Colors.primaryTint,
         borderRadius: 20,
     },
     sessionIndicator: {
@@ -483,7 +483,7 @@ const styles = StyleSheet.create({
         marginRight: 6,
     },
     mindfulnessLegend: {
-        backgroundColor: '#9333EA',
+        backgroundColor: Colors.plum,
     },
     todayLegend: {
         backgroundColor: Colors.primary,
@@ -503,8 +503,7 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontWeight: '800',
         color: Colors.textMuted,
-        textTransform: 'uppercase',
-        letterSpacing: 1.5,
+        letterSpacing: 0.2,
         marginBottom: 12,
         paddingLeft: 4,
     },
@@ -535,7 +534,7 @@ const styles = StyleSheet.create({
     eventCardCompleted: {
         backgroundColor: Colors.primaryTint,
         borderWidth: 1.5,
-        borderColor: '#C2E7CD',
+        borderColor: Colors.primaryTint,
     },
     eventIcon: {
         width: 44,
@@ -546,10 +545,10 @@ const styles = StyleSheet.create({
         marginRight: 16,
     },
     iconMindfulness: {
-        backgroundColor: '#F3E8FF',
+        backgroundColor: Colors.plumTint,
     },
     iconDefault: {
-        backgroundColor: '#E0F2FE',
+        backgroundColor: Colors.primaryTint,
     },
     eventContent: {
         flex: 1,
@@ -591,7 +590,7 @@ const styles = StyleSheet.create({
         padding: 24,
         width: '100%',
         maxWidth: 340,
-        shadowColor: '#000',
+        shadowColor: Colors.shadow,
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.1,
         shadowRadius: 20,

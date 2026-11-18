@@ -76,8 +76,8 @@ export default function AboutMeFrontScreen() {
                     </View>
 
                     <View style={[panelStyles.introPanel, { paddingBottom: 28 + insets.bottom }]}>
-                        <Text style={panelStyles.introPanelTitle}>YOUR PROFILE</Text>
-                        <Text style={panelStyles.introPanelSubtitle}>TELL US ABOUT YOURSELF</Text>
+                        <Text style={panelStyles.introPanelTitle}>Your profile</Text>
+                        <Text style={panelStyles.introPanelSubtitle}>Tell us about yourself</Text>
 
                         <View style={panelStyles.introCard}>
                             <View style={styles.introIconRow}>

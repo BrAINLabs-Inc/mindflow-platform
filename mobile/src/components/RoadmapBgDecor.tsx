@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { Colors } from '../constants/colors';
 
 interface Props {
     isCG: boolean;
@@ -8,11 +9,11 @@ interface Props {
 }
 
 // Two soft round glows, same treatment as OnboardingScreen's glowYellow/glowBlue —
-// colored by research group so the roadmap still reads CG (amber) vs EX (sage/teal)
+// colored by research group so the roadmap still reads CG (ochre) vs EX (sage)
 // at a glance, without the leaf/bird scene that used to sit behind the nodes.
 function RoadmapBgDecorImpl({ isCG, w, h }: Props) {
-    const colorPrimary = isCG ? '#D97706' : '#749F82';
-    const colorSecondary = isCG ? '#F59E0B' : '#7FD9D1';
+    const colorPrimary = isCG ? Colors.ochre : Colors.primaryLight;
+    const colorSecondary = isCG ? Colors.accentTint : Colors.primaryTint;
 
     return (
         <View style={[StyleSheet.absoluteFillObject, { width: w, height: h }]} pointerEvents="none">
@@ -30,7 +31,7 @@ const styles = StyleSheet.create({
         width: 180,
         height: 180,
         borderRadius: 90,
-        opacity: 0.12,
+        opacity: 0.1,
     },
     glowSecondary: {
         position: 'absolute',
@@ -39,7 +40,7 @@ const styles = StyleSheet.create({
         width: 220,
         height: 220,
         borderRadius: 110,
-        opacity: 0.18,
+        opacity: 0.12,
     },
 });
 

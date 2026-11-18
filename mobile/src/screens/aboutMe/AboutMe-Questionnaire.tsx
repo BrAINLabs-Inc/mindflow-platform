@@ -28,7 +28,7 @@ const GoalsIllustration = require('../../../assets/goals.png') as number;
 
 // One themed illustration per wizard step, matching each section's topic.
 const STEP_ILLUSTRATIONS = [AcademicIllustration, ProfileIllustration, GoalsIllustration];
-const STEP_TITLES = ['ACADEMIC DETAILS', 'PERSONAL PROFILE', 'GOALS & HOBBIES'];
+const STEP_TITLES = ['Academic details', 'Personal profile', 'Goals & hobbies'];
 const TOTAL_STEPS = STEP_TITLES.length;
 
 // 3-step wizard (Signup-style: illustration + one blue panel showing only the
@@ -274,7 +274,7 @@ export default function AboutMeQuestionnaireScreen() {
                                     <View key={i} style={[styles.stepDot, formStep === i && styles.stepDotActive]} />
                                 ))}
                             </View>
-                            <Text style={panelStyles.introPanelTitle}>STEP {formStep + 1} OF {TOTAL_STEPS}</Text>
+                            <Text style={panelStyles.introPanelTitle}>Step {formStep + 1} of {TOTAL_STEPS}</Text>
                             <Text style={panelStyles.introPanelSubtitle}>{STEP_TITLES[formStep]}</Text>
 
                             {formStep === 0 && (
@@ -531,7 +531,7 @@ export default function AboutMeQuestionnaireScreen() {
                                         activeOpacity={0.7}
                                     >
                                         <View style={[styles.checkbox, declarationChecked && styles.checkboxActive]}>
-                                            {declarationChecked && <Ionicons name="checkmark" size={16} color="#fff" />}
+                                            {declarationChecked && <Ionicons name="checkmark" size={16} color={Colors.white} />}
                                         </View>
                                         <Text style={styles.checkboxLabel}>
                                             I hereby confirm that all information provided above is true, accurate, and complete.
@@ -566,7 +566,7 @@ export default function AboutMeQuestionnaireScreen() {
                                         activeOpacity={0.8}
                                     >
                                         {saving ? (
-                                            <ActivityIndicator color="#fff" size="small" />
+                                            <ActivityIndicator color={Colors.white} size="small" />
                                         ) : (
                                             <>
                                                 <Text style={styles.nextButtonText}>Submit</Text>
@@ -634,7 +634,7 @@ const styles = StyleSheet.create({
         width: 8,
         height: 8,
         borderRadius: 4,
-        backgroundColor: '#BFDBFE',
+        backgroundColor: Colors.border,
     },
     stepDotActive: {
         backgroundColor: ABOUT_ME_ACCENT,
@@ -684,7 +684,7 @@ const styles = StyleSheet.create({
         elevation: 5,
     },
     nextButtonDisabled: {
-        backgroundColor: '#CBD5E1',
+        backgroundColor: Colors.border,
         shadowOpacity: 0,
         elevation: 0,
     },
@@ -699,15 +699,15 @@ const styles = StyleSheet.create({
     fieldLabel: {
         fontSize: 13,
         fontWeight: '700',
-        color: '#1A1A2E',
+        color: Colors.textPrimary,
         marginBottom: 8,
         letterSpacing: 0.1,
     },
     required: {
-        color: '#EF4444',
+        color: Colors.error,
     },
     input: {
-        backgroundColor: '#F8FAFC',
+        backgroundColor: Colors.surfaceMuted,
         borderWidth: 1.5,
         borderColor: Colors.borderLight,
         borderRadius: 14,
@@ -746,7 +746,7 @@ const styles = StyleSheet.create({
     pillText: {
         fontSize: 13,
         fontWeight: '500',
-        color: '#334155',
+        color: Colors.textPrimary,
     },
     pillTextActive: {
         color: ABOUT_ME_ACCENT,
@@ -758,7 +758,7 @@ const styles = StyleSheet.create({
     selectRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#F8FAFC',
+        backgroundColor: Colors.surfaceMuted,
         borderWidth: 1.5,
         borderColor: Colors.borderLight,
         borderRadius: 14,
@@ -775,7 +775,7 @@ const styles = StyleSheet.create({
         height: 20,
         borderRadius: 10,
         borderWidth: 2,
-        borderColor: '#CBD5E1',
+        borderColor: Colors.border,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -790,18 +790,18 @@ const styles = StyleSheet.create({
     },
     selectRowText: {
         fontSize: 14,
-        color: '#334155',
+        color: Colors.textPrimary,
         fontWeight: '500',
         flex: 1,
     },
     selectRowTextActive: {
-        color: '#1A1A2E',
+        color: Colors.textPrimary,
         fontWeight: '700',
     },
     placeholderBox: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#F8FAFC',
+        backgroundColor: Colors.surfaceMuted,
         borderWidth: 1.5,
         borderColor: Colors.borderLight,
         borderRadius: 14,
@@ -823,7 +823,7 @@ const styles = StyleSheet.create({
         borderWidth: 1.5,
         borderColor: Colors.borderLight,
         alignItems: 'center',
-        shadowColor: '#475569',
+        shadowColor: Colors.textSecondary,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.04,
         shadowRadius: 8,
@@ -831,14 +831,14 @@ const styles = StyleSheet.create({
     },
     checkboxChecked: {
         borderColor: ABOUT_ME_ACCENT,
-        backgroundColor: '#F8FAFC',
+        backgroundColor: Colors.surfaceMuted,
     },
     checkbox: {
         width: 22,
         height: 22,
         borderRadius: 6,
         borderWidth: 2,
-        borderColor: '#CBD5E1',
+        borderColor: Colors.border,
         marginRight: 12,
         justifyContent: 'center',
         alignItems: 'center',
@@ -850,7 +850,7 @@ const styles = StyleSheet.create({
     checkboxLabel: {
         flex: 1,
         fontSize: 13,
-        color: '#1A1A2E',
+        color: Colors.textPrimary,
         lineHeight: 18,
         fontWeight: '500',
     },
