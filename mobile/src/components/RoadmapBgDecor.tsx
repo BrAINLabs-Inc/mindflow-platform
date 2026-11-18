@@ -12,8 +12,8 @@ interface Props {
 // colored by research group so the roadmap still reads CG (ochre) vs EX (sage)
 // at a glance, without the leaf/bird scene that used to sit behind the nodes.
 function RoadmapBgDecorImpl({ isCG, w, h }: Props) {
-    const colorPrimary = isCG ? Colors.ochre : Colors.primaryLight;
-    const colorSecondary = isCG ? Colors.accentTint : Colors.primaryTint;
+    const colorPrimary = isCG ? Colors.ochre : Colors.sea;
+    const colorSecondary = isCG ? Colors.accent : Colors.plum;
 
     return (
         <View style={[StyleSheet.absoluteFillObject, { width: w, height: h }]} pointerEvents="none">

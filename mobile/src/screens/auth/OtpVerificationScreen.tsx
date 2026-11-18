@@ -372,7 +372,7 @@ const styles = StyleSheet.create({
     illusContainer: { alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
     // Panel
     bottomPanel: {
-        backgroundColor: Colors.surfaceMuted,
+        backgroundColor: Colors.blueTint,
         width: '100%',
         borderTopLeftRadius: 40,
         borderTopRightRadius: 40,

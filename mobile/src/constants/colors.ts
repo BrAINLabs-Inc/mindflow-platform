@@ -1,53 +1,45 @@
-// MindFlow "Sage & Sand" palette — calm, warm and low-contrast-on-purpose for a
-// mindfulness study, while keeping body text at WCAG AA contrast on the
-// backgrounds it's used on. One brand colour (deep sage) carries every primary
-// action; the five roadmap activities each get a muted tone from the same
-// family instead of five unrelated bright accents.
+// MindFlow "Bright & Friendly" palette — energetic, saturated colours on clean
+// white surfaces (in the spirit of the original MindFlow look), organised as
+// tokens so the whole app stays consistent. Body text stays dark navy for
+// WCAG AA contrast; the colour lives in accents, icons, buttons and panels.
 //
 // Use these tokens (and typography/spacing/radius from ./theme) rather than
-// inline hex values, so the whole app stays on one palette.
+// inline hex values.
 
-const sage = {
-  900: '#2C4B3F',
-  700: '#3F6B5A', // brand primary
-  500: '#6E9583',
-  300: '#A9C3B6',
-  100: '#E3ECE6',
-  50: '#F1F6F2',
-};
-
-const sand = {
-  50: '#FAF7F2', // app background
-  100: '#F3EDE3', // soft surface
-  200: '#E8E1D6', // borders
-  300: '#D9CFBF',
+const green = {
+  900: '#0E7A57',
+  700: '#14A06F', // brand primary: fresh green
+  500: '#3CC28F',
+  300: '#A3E6CB',
+  100: '#E1F7EE',
+  50: '#F1FCF7',
 };
 
 const ink = {
-  900: '#26302C', // headings / body
-  600: '#5F6B66', // secondary text
-  400: '#97A09B', // muted text, inactive icons
-  300: '#B9BFBB', // placeholders
+  900: '#1E2A3A', // headings / body (navy)
+  600: '#5A6578', // secondary text
+  400: '#96A0B2', // muted text, inactive icons
+  300: '#BCC3D0', // placeholders
 };
 
 export const Colors = {
   // Surfaces
-  background: sand[50],
+  background: '#F7F8FC',
   surface: '#FFFFFF',
-  surfaceMuted: sand[100],
+  surfaceMuted: '#F1F3F9',
   white: '#FFFFFF',
 
   // Brand
-  primary: sage[700],
-  primaryDark: sage[900],
-  primarySoft: sage[500],
-  primaryLight: sage[300],
-  primaryTint: sage[100],
-  primaryWash: sage[50],
-  secondary: sage[300],
-  accent: '#C47B5A', // soft clay: highlights, "today" markers
-  accentTint: '#F6EADF',
-  accentBlue: '#5A7D9A',
+  primary: green[700],
+  primaryDark: green[900],
+  primarySoft: green[500],
+  primaryLight: green[300],
+  primaryTint: green[100],
+  primaryWash: green[50],
+  secondary: green[300],
+  accent: '#FF8A3D', // vivid orange: highlights, "today" markers
+  accentTint: '#FFF1E5',
+  accentBlue: '#3B8FF0',
 
   // Text
   textPrimary: ink[900],
@@ -58,45 +50,45 @@ export const Colors = {
   textOnPrimary: '#FFFFFF',
 
   // Lines
-  border: sand[200],
-  borderLight: '#EFE9DF',
-  borderStrong: sand[300],
+  border: '#E4E8F1',
+  borderLight: '#EEF1F7',
+  borderStrong: '#D3D9E6',
 
-  // Muted secondary tones (ink + tint pairs) — one per kind of content
-  blue: '#5A7D9A',
-  blueTint: '#E5EDF3',
-  plum: '#7D6F96',
-  plumTint: '#ECE8F2',
-  sea: '#4E8A86',
-  seaTint: '#E2EFEC',
-  ochre: '#B08A45',
-  ochreTint: '#F4ECDA',
+  // Bright secondary tones (ink + tint pairs)
+  blue: '#3B8FF0',
+  blueTint: '#E8F2FE',
+  plum: '#6C63FF', // indigo
+  plumTint: '#EEEDFF',
+  sea: '#14B8A6', // teal
+  seaTint: '#DFF7F3',
+  ochre: '#F5B523', // sunny yellow
+  ochreTint: '#FFF6DB',
 
-  // Functional (muted, not alarm-red)
-  success: sage[500],
-  successTint: sage[100],
-  warning: '#B08A45',
-  warningTint: '#F4ECDA',
-  error: '#B85C4E',
-  errorTint: '#F7E4DF',
+  // Functional
+  success: green[500],
+  successTint: green[100],
+  warning: '#F5B523',
+  warningTint: '#FFF6DB',
+  error: '#F25C54', // coral red
+  errorTint: '#FDECEB',
 
-  shadow: '#2B2620',
-  overlay: 'rgba(38, 48, 44, 0.45)',
+  shadow: '#1E2A3A',
+  overlay: 'rgba(30, 42, 58, 0.45)',
 
-  // Roadmap activities: each step keeps its own identity, all from one family.
+  // Roadmap activities: each step has its own bright identity colour.
   tasks: {
-    daily: { ink: sage[700], tint: sage[100] },
-    weekly: { ink: '#5A7D9A', tint: '#E5EDF3' },
-    thrive: { ink: '#B08A45', tint: '#F4ECDA' },
-    stress: { ink: '#C47B5A', tint: '#F6EADF' },
-    mindful: { ink: '#7D6F96', tint: '#ECE8F2' },
+    daily: { ink: '#FF8A3D', tint: '#FFF1E5' },   // orange
+    weekly: { ink: '#6C63FF', tint: '#EEEDFF' },  // indigo
+    thrive: { ink: green[700], tint: green[100] }, // green
+    stress: { ink: '#F25C54', tint: '#FDECEB' },  // coral
+    mindful: { ink: '#14B8A6', tint: '#DFF7F3' }, // teal
   },
 
   gradients: {
-    primary: [sage[700], sage[900]] as [string, string],
-    calm: [sage[50], sand[50]] as [string, string],
-    blueMethods: ['#E5EDF3', '#D6E2EC'] as [string, string],
-    darkCard: [sage[700], sage[900]] as [string, string],
+    primary: [green[500], green[700]] as [string, string],
+    calm: ['#E8F2FE', '#FFF6DB'] as [string, string],
+    blueMethods: ['#E8F2FE', '#D6E7FD'] as [string, string],
+    darkCard: [green[700], green[900]] as [string, string],
   },
 };
 

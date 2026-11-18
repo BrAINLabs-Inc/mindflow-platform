@@ -30,7 +30,7 @@ function CalmSceneImpl({ width, height = 150, tone = 'sage' }: CalmSceneProps) {
     }, [breath]);
 
     const sun = tone === 'warm' ? Colors.ochre : Colors.accent;
-    const sunTint = tone === 'warm' ? Colors.ochreTint : Colors.accentTint;
+    const sunTint = tone === 'warm' ? '#FFE9A8' : '#FFD9BD';
     const w = width;
     const h = height;
     const sunX = w * 0.68;
@@ -40,7 +40,7 @@ function CalmSceneImpl({ width, height = 150, tone = 'sage' }: CalmSceneProps) {
     return (
         <View style={[styles.wrap, { width: w, height: h }]}>
             {/* Layers, back to front: sky, breathing halo, sun + hills. */}
-            <LinearGradient colors={[Colors.primaryWash, Colors.background]} style={StyleSheet.absoluteFill} />
+            <LinearGradient colors={[Colors.blueTint, Colors.ochreTint]} style={StyleSheet.absoluteFill} />
             <Animated.View
                 pointerEvents="none"
                 style={[

@@ -389,7 +389,7 @@ const styles = StyleSheet.create({
     scrollContent: { flexGrow: 1, alignItems: 'center' },
     illustrationContainer: { alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
     bottomPanel: {
-        backgroundColor: Colors.surfaceMuted,
+        backgroundColor: Colors.blueTint,
         width: '100%',
         borderTopLeftRadius: 40,
         borderTopRightRadius: 40,

@@ -12,9 +12,9 @@ export function PanelWave() {
         <Svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ position: 'absolute', bottom: 0, left: 0 }} pointerEvents="none">
             <Defs>
                 <SvgGradient id="lwg" x1="0" y1="0" x2="1" y2="0">
-                    <Stop offset="0" stopColor={Colors.primaryLight} stopOpacity="1" />
-                    <Stop offset="0.5" stopColor={Colors.primarySoft} stopOpacity="1" />
-                    <Stop offset="1" stopColor={Colors.primaryLight} stopOpacity="1" />
+                    <Stop offset="0" stopColor={Colors.primarySoft} stopOpacity="1" />
+                    <Stop offset="0.5" stopColor={Colors.sea} stopOpacity="1" />
+                    <Stop offset="1" stopColor={Colors.blue} stopOpacity="1" />
                 </SvgGradient>
             </Defs>
             <Path d={`M0 ${h * 0.4} C${w * 0.25} ${h * 0.1} ${w * 0.5} ${h * 0.7} ${w * 0.75} ${h * 0.3} C${w * 0.88} ${h * 0.1} ${w} ${h * 0.4} ${w} ${h * 0.4} L${w} ${h} L0 ${h} Z`} fill="url(#lwg)" opacity={0.22} />

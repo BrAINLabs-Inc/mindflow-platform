@@ -23,11 +23,11 @@ type Shades = { primary: string; light: string; bg: string; dark: string };
 // Illustration shades per roadmap activity, keyed by that activity's ink colour
 // (Colors.tasks.*.ink) so each screen's artwork matches its accent.
 const TASK_SHADES: Record<string, Shades> = {
-  [Colors.tasks.daily.ink.toUpperCase()]: { primary: Colors.tasks.daily.ink, light: Colors.primarySoft, bg: Colors.tasks.daily.tint, dark: Colors.primaryDark },
-  [Colors.tasks.weekly.ink.toUpperCase()]: { primary: Colors.tasks.weekly.ink, light: '#8EA9BF', bg: Colors.tasks.weekly.tint, dark: '#415D75' },
-  [Colors.tasks.thrive.ink.toUpperCase()]: { primary: Colors.tasks.thrive.ink, light: '#CDAE72', bg: Colors.tasks.thrive.tint, dark: '#8A6A30' },
-  [Colors.tasks.stress.ink.toUpperCase()]: { primary: Colors.tasks.stress.ink, light: '#DBA085', bg: Colors.tasks.stress.tint, dark: '#9C5A3E' },
-  [Colors.tasks.mindful.ink.toUpperCase()]: { primary: Colors.tasks.mindful.ink, light: '#A598BA', bg: Colors.tasks.mindful.tint, dark: '#5E5276' },
+  [Colors.tasks.daily.ink.toUpperCase()]: { primary: Colors.tasks.daily.ink, light: '#FFB27D', bg: Colors.tasks.daily.tint, dark: '#E06A1B' },
+  [Colors.tasks.weekly.ink.toUpperCase()]: { primary: Colors.tasks.weekly.ink, light: '#9D97FF', bg: Colors.tasks.weekly.tint, dark: '#4B43D9' },
+  [Colors.tasks.thrive.ink.toUpperCase()]: { primary: Colors.tasks.thrive.ink, light: Colors.primarySoft, bg: Colors.tasks.thrive.tint, dark: Colors.primaryDark },
+  [Colors.tasks.stress.ink.toUpperCase()]: { primary: Colors.tasks.stress.ink, light: '#FF8F89', bg: Colors.tasks.stress.tint, dark: '#D23E37' },
+  [Colors.tasks.mindful.ink.toUpperCase()]: { primary: Colors.tasks.mindful.ink, light: '#4FD1C2', bg: Colors.tasks.mindful.tint, dark: '#0E8F81' },
 };
 
 const getColorShades = (primary?: string): Shades => {
@@ -188,28 +188,28 @@ export const ThriveIllustration = ({ width = 209, height = 186, color }: Illustr
       <SafePath d="M35.4651 51.0588C36.2309 53.6473 36.3331 56.3869 35.7624 59.0253C35.1155 60.9558 34.2099 62.7897 33.0701 64.4766C32.5302 64.6551 26.6033 63.8794 25.2215 61.3C24.3552 59.5763 23.8073 57.7102 23.6041 55.7916C23.4258 55.0159 26.658 48.7222 30.7893 48.8435C34.9205 48.9649 35.2986 50.3973 35.4651 51.0588Z" fill="#FFDEBB" />
       <SafePath d="M37.9669 49.9247C36.8681 50.3744 37.7005 51.6498 35.6385 51.8283C33.5764 52.0067 33.0984 49.4892 33.0984 49.4892C33.0112 49.8008 32.8503 50.0867 32.6292 50.3228C32.4081 50.5589 32.1334 50.7382 31.8284 50.8455C31.8284 50.8455 32.3801 49.7748 31.5905 49.3013C31.3964 49.163 31.1574 49.1026 30.9209 49.1321C30.6844 49.1616 30.4675 49.2789 30.3133 49.4607C30.2136 49.4136 30.1049 49.3887 29.9946 49.3877C29.8843 49.3867 29.7752 49.4096 29.6746 49.4548C29.574 49.5 29.4844 49.5665 29.412 49.6497C29.3395 49.7328 29.286 49.8307 29.255 49.9366C28.8863 50.7599 29.5522 51.2548 30.4203 51.3476C30.4203 51.3476 30.4988 52.573 28.5581 52.7586C26.6173 52.9442 26.2154 51.7474 26.2154 51.7474C26.2154 51.7474 25.8967 51.4547 25.7611 52.3065C25.6255 53.1584 26.2915 54.5432 24.9358 55.6378C24.6372 55.9096 24.2967 56.1314 23.9274 56.2945C24.61 56.8846 24.2794 58.674 22.7382 59.4116C20.6357 60.4062 19.0945 59.671 18.9043 58.2219C18.7306 56.9084 19.5678 57.4248 19.3538 56.4135C19.182 56.5495 18.9827 56.6464 18.7697 56.6974C18.5567 56.7484 18.3351 56.7523 18.1204 56.7088C17.9057 56.6653 17.7031 56.5755 17.5267 56.4456C17.3503 56.3157 17.2044 56.1488 17.0991 55.9566C17.0037 55.7946 16.942 55.615 16.9177 55.4285C16.8934 55.242 16.9069 55.0526 16.9576 54.8715C17.0082 54.6904 17.0949 54.5214 17.2124 54.3746C17.3299 54.2279 17.4757 54.1064 17.6413 54.0174C17.6413 54.0174 16.7399 52.78 17.4891 51.9163C18.3358 50.9312 19.6606 51.5689 19.4655 50.9645C19.2705 50.3601 18.7663 48.9134 19.5892 48.1092C20.4121 47.3049 21.7298 47.6333 21.9034 47.2026C22.077 46.7719 21.8249 46.1437 20.9734 46.5125C21.0071 46.2377 21.1004 45.9736 21.2466 45.7385C21.3928 45.5034 21.5886 45.3031 21.8201 45.1515C22.2266 44.9441 22.6713 44.8226 23.1267 44.7943C23.582 44.7661 24.0383 44.8318 24.4673 44.9873C24.5132 44.5862 24.654 44.2019 24.8782 43.8663C25.1025 43.5306 25.4035 43.2534 25.7563 43.0576C26.2589 42.8166 26.8319 42.7668 27.3684 42.9174C27.9049 43.068 28.3684 43.4088 28.6722 43.8761C28.7522 43.6399 28.8987 43.4318 29.094 43.2769C29.2894 43.122 29.5253 43.0268 29.7734 43.0028C31.4216 42.7649 32.7797 43.1932 33.1032 44.5233C33.4385 45.9248 35.8882 42.6935 37.0417 45.4561C37.2796 46.02 36.6612 46.4673 37.3604 46.9218C37.7552 47.1788 38.2618 46.3388 37.867 46.0438C38.3593 46.2478 38.7695 46.6104 39.0324 47.0741C39.1678 47.3281 39.2476 47.6079 39.2666 47.8951C39.2855 48.1823 39.2432 48.4703 39.1424 48.7399C39.0417 49.0094 38.8848 49.2545 38.6821 49.4588C38.4794 49.6631 38.2356 49.8219 37.9669 49.9247V49.9247Z" fill="url(#thriveHair)" />
       
-      <Circle cx="160" cy="30" r="25" fill={shades.light} />
-      <SafePath d="M160 0V15" stroke={shades.light} strokeWidth="4" />
-      <SafePath d="M160 45V60" stroke={shades.light} strokeWidth="4" />
-      <SafePath d="M130 30H145" stroke={shades.light} strokeWidth="4" />
-      <SafePath d="M175 30H190" stroke={shades.light} strokeWidth="4" />
-      <SafePath d="M137 7L147 17" stroke={shades.light} strokeWidth="4" />
-      <SafePath d="M173 43L183 53" stroke={shades.light} strokeWidth="4" />
-      <SafePath d="M137 53L147 43" stroke={shades.light} strokeWidth="4" />
-      <SafePath d="M173 17L183 7" stroke={shades.light} strokeWidth="4" />
+      <Circle cx="160" cy="30" r="25" fill={Colors.ochre} />
+      <SafePath d="M160 0V15" stroke={Colors.ochre} strokeWidth="4" />
+      <SafePath d="M160 45V60" stroke={Colors.ochre} strokeWidth="4" />
+      <SafePath d="M130 30H145" stroke={Colors.ochre} strokeWidth="4" />
+      <SafePath d="M175 30H190" stroke={Colors.ochre} strokeWidth="4" />
+      <SafePath d="M137 7L147 17" stroke={Colors.ochre} strokeWidth="4" />
+      <SafePath d="M173 43L183 53" stroke={Colors.ochre} strokeWidth="4" />
+      <SafePath d="M137 53L147 43" stroke={Colors.ochre} strokeWidth="4" />
+      <SafePath d="M173 17L183 7" stroke={Colors.ochre} strokeWidth="4" />
 
       <Defs>
         <LinearGradient id="thrivePaint0" x1="43.1973" y1="69.4191" x2="43.1973" y2="108.838" gradientUnits="userSpaceOnUse">
           <Stop offset="0" stopColor={shades.primary} />
-          <Stop offset="1" stopColor={shades.light} />
+          <Stop offset="1" stopColor={Colors.ochre} />
         </LinearGradient>
         <LinearGradient id="thrivePaint1" x1="19.0627" y1="65.1837" x2="19.0627" y2="132.539" gradientUnits="userSpaceOnUse">
           <Stop offset="0" stopColor={shades.primary} />
-          <Stop offset="1" stopColor={shades.light} />
+          <Stop offset="1" stopColor={Colors.ochre} />
         </LinearGradient>
         <LinearGradient id="thrivePaint2" x1="30.4339" y1="72.554" x2="30.4339" y2="106.048" gradientUnits="userSpaceOnUse">
           <Stop offset="0" stopColor={shades.primary} />
-          <Stop offset="1" stopColor={shades.light} />
+          <Stop offset="1" stopColor={Colors.ochre} />
         </LinearGradient>
         <LinearGradient id="thriveHair" x1="10" y1="40" x2="60" y2="70" gradientUnits="userSpaceOnUse">
           <Stop offset="0" stopColor="#1D0024" />
@@ -225,7 +225,7 @@ export const ThriveIllustration = ({ width = 209, height = 186, color }: Illustr
         </LinearGradient>
         <LinearGradient id="thrivePaint5" x1="180.462" y1="29.6688" x2="180.462" y2="34.1588" gradientUnits="userSpaceOnUse">
           <Stop offset="0" stopColor={Colors.accent} />
-          <Stop offset="1" stopColor={shades.light} />
+          <Stop offset="1" stopColor={Colors.ochre} />
         </LinearGradient>
         <LinearGradient id="thrivePaint6" x1="184.959" y1="11.4428" x2="184.959" y2="37.1904" gradientUnits="userSpaceOnUse">
           <Stop offset="0" stopColor="#1D0024" />
@@ -237,7 +237,7 @@ export const ThriveIllustration = ({ width = 209, height = 186, color }: Illustr
         </LinearGradient>
         <LinearGradient id="thrivePaint8" x1="108.963" y1="72.8178" x2="108.963" y2="64.1946" gradientUnits="userSpaceOnUse">
           <Stop offset="0" stopColor={Colors.accent} />
-          <Stop offset="1" stopColor={shades.light} />
+          <Stop offset="1" stopColor={Colors.ochre} />
         </LinearGradient>
         <LinearGradient id="thrivePaint9" x1="110.03" y1="57.286" x2="110.03" y2="66.0567" gradientUnits="userSpaceOnUse">
           <Stop offset="0" stopColor={shades.primary} />
@@ -245,7 +245,7 @@ export const ThriveIllustration = ({ width = 209, height = 186, color }: Illustr
         </LinearGradient>
         <LinearGradient id="thrivePaint10" x1="174.084" y1="67.0621" x2="138.635" y2="102.495" gradientUnits="userSpaceOnUse">
           <Stop offset="0" stopColor={shades.bg} />
-          <Stop offset="1" stopColor={shades.light} />
+          <Stop offset="1" stopColor={Colors.ochre} />
         </LinearGradient>
         <LinearGradient id="thrivePaint11" x1="161.614" y1="75.788" x2="146.643" y2="88.3068" gradientUnits="userSpaceOnUse">
           <Stop offset="0" stopColor="#FFDEBB" />
@@ -257,7 +257,7 @@ export const ThriveIllustration = ({ width = 209, height = 186, color }: Illustr
         </LinearGradient>
         <LinearGradient id="thrivePaint13" x1="156.367" y1="102.511" x2="156.367" y2="67.0621" gradientUnits="userSpaceOnUse">
           <Stop offset="0" stopColor={Colors.accent} />
-          <Stop offset="1" stopColor={shades.light} />
+          <Stop offset="1" stopColor={Colors.ochre} />
         </LinearGradient>
       </Defs>
     </Svg>

@@ -610,11 +610,11 @@ export default function DashboardScreen() {
                 <View style={styles.roadmapWrap}>
                     <View style={[
                         styles.roadmapPanel,
-                        { paddingBottom: tabBarHeight + 24 }
+                        { backgroundColor: isControlGroup ? Colors.accentTint : Colors.blueTint, paddingBottom: tabBarHeight + 24 }
                     ]}>
                         <Text style={[
                             styles.panelLabel,
-                            { color: isControlGroup ? Colors.accent : Colors.primarySoft }
+                            { color: isControlGroup ? Colors.accent : Colors.plum }
                         ]}>{isControlGroup ? 'Your activities' : 'Your journey'}</Text>
                         <Text style={styles.panelHeading}>{isControlGroup ? 'Weekly check-ins' : 'Mindfulness roadmap'}</Text>
 
@@ -682,8 +682,11 @@ export default function DashboardScreen() {
                             >
                                 <Defs>
                                     <SvgLinearGradient id="pathGrad" x1="0" y1="0" x2="0" y2="1">
-                                        <Stop offset="0" stopColor={Colors.primarySoft} stopOpacity="0.7" />
-                                        <Stop offset="1" stopColor={Colors.primaryLight} stopOpacity="0.7" />
+                                        <Stop offset="0" stopColor={Colors.tasks.daily.ink} stopOpacity="0.85" />
+                                        <Stop offset="0.25" stopColor={Colors.tasks.weekly.ink} stopOpacity="0.85" />
+                                        <Stop offset="0.5" stopColor={Colors.tasks.thrive.ink} stopOpacity="0.85" />
+                                        <Stop offset="0.75" stopColor={Colors.tasks.stress.ink} stopOpacity="0.85" />
+                                        <Stop offset="1" stopColor={Colors.tasks.mindful.ink} stopOpacity="0.85" />
                                     </SvgLinearGradient>
                                 </Defs>
                                 <Path

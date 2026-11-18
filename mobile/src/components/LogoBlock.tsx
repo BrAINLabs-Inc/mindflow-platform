@@ -28,10 +28,10 @@ const styles = StyleSheet.create({
     logoBlock: { alignItems: 'center', marginBottom: 4 },
     logoBlockCompact: { alignItems: 'flex-start', marginBottom: 0 },
     logoRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-    dot: { width: 14, height: 14, borderRadius: 7, borderTopRightRadius: 2, backgroundColor: Colors.primarySoft },
+    dot: { width: 14, height: 14, borderRadius: 7, borderTopRightRadius: 2, backgroundColor: Colors.accent },
     dotCompact: { width: 11, height: 11, borderRadius: 6, borderTopRightRadius: 2 },
     wordmark: { fontSize: 28, fontWeight: '700', color: Colors.primary, letterSpacing: -0.5 },
     wordmarkCompact: { fontSize: 21 },
-    mind: { fontWeight: '400', color: Colors.primarySoft },
+    mind: { fontWeight: '400', color: Colors.sea },
     tagline: { fontSize: 13, color: Colors.textMuted, marginTop: 4, fontWeight: '500', letterSpacing: 0.2 },
 });
