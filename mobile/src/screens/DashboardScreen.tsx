@@ -6,7 +6,7 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Svg, { Path, Defs, LinearGradient as SvgLinearGradient, Stop, Circle } from 'react-native-svg';
+import Svg, { Circle } from 'react-native-svg';
 
 import { RootStackParamList } from '../types/navigation';
 import { Colors } from '../constants/colors';
@@ -18,10 +18,10 @@ import { JourneyIcons } from '../components/JourneyIcons';
 import { PopupModal } from '../components/PopupModal';
 import { LogoBlock } from '../components/LogoBlock';
 import { PanelWave } from '../components/PanelWave';
-import { RoadmapBgDecor } from '../components/RoadmapBgDecor';
+import { RoadmapScene } from '../components/RoadmapScene';
 import { CalmScene } from '../components/CalmScene';
 import { Radius, Typography } from '../constants/theme';
-import { cardShadow } from '../styles/shared';
+import { cardShadow, cardShadowElevated } from '../styles/shared';
 
 
 const { width } = Dimensions.get('window');
@@ -279,14 +279,11 @@ const RoadmapNode = memo(({
                     id === 5 && styles.nodeCircleLarge,
                     completed ? {
                         backgroundColor: color,
-                        borderColor: color,
                         shadowColor: color,
-                        shadowOpacity: 0.4,
+                        shadowOpacity: 0.35,
                         shadowRadius: 10,
-                        borderWidth: 0,
                     } : {
                         backgroundColor: locked ? Colors.surfaceMuted : bgColor,
-                        borderColor: locked ? Colors.border : color
                     }
                 ]}>
                     {completed ? (
@@ -532,34 +529,24 @@ export default function DashboardScreen() {
 
     const isControlGroup = researchGroup === 'cg';
     const isUnassigned = summaryLoaded && researchGroup === '';
-    const mapWidth = width - 48;
-    const mapHeight = 520;
+    const mapHeight = 600;
     const activeStepId = getActiveStepId();
 
     const completedCount = isUnassigned ? 0 : JOURNEY_STEPS.filter(s => getStatus(s.statusKey).completed).length;
     const journeyProgress = completedCount / JOURNEY_STEPS.length;
 
-    // Exact center coordinates calculation for the connecting path
-    const cx1 = mapWidth - 52;
-    const cy1 = 62;
-
-    const cx2 = 52;
-    const cy2 = 162;
-
-    const cx3 = mapWidth - 52;
-    const cy3 = 262;
-
-    const cx4 = 52;
-    const cy4 = 362;
-
-    const cx5 = mapWidth - 52;
-    const cy5 = 462;
-
-    const pathD = `M ${cx1} ${cy1} ` +
-                  `C ${mapWidth * 0.4} ${cy1}, ${mapWidth * 0.6} ${cy2}, ${cx2} ${cy2} ` +
-                  `C ${mapWidth * 0.6} ${cy2}, ${mapWidth * 0.4} ${cy3}, ${cx3} ${cy3} ` +
-                  `C ${mapWidth * 0.4} ${cy3}, ${mapWidth * 0.6} ${cy4}, ${cx4} ${cy4} ` +
-                  `C ${mapWidth * 0.6} ${cy4}, ${mapWidth * 0.4} ${cy5}, ${cx5} ${cy5}`;
+    // Stop centres in scene coordinates. Each stop's 64pt circle wrapper sits
+    // NODE_INSET from the map edge (left or right alternately), and the scene
+    // bleeds MAP_BLEED past the map on both sides to reach the screen edges.
+    const MAP_BLEED = 20;
+    const NODE_INSET = 24;
+    const NODE_HALF = 32;
+    const sceneWidth = width;
+    const leftX = MAP_BLEED + NODE_INSET + NODE_HALF;
+    const rightX = sceneWidth - MAP_BLEED - NODE_INSET - NODE_HALF;
+    const NODE_TOPS = [30, 130, 230, 330, 430];
+    const scenePoints = NODE_TOPS.map((top, i) => ({ x: i % 2 === 0 ? rightX : leftX, y: top + NODE_HALF }));
+    const stepCompleted = JOURNEY_STEPS.map((step) => !isUnassigned && !!getStatus(step.statusKey).completed);
 
     const [headerHeight, setHeaderHeight] = useState(0);
 
@@ -668,50 +655,25 @@ export default function DashboardScreen() {
 
                         {/* Winding Roadmap Pathway */}
                         <View style={[styles.mapContainer, { height: mapHeight }]}>
-                            {/* Organic leaves, suns, and bird silhouettes decoration, bled past the
-                                panel's side padding so it reaches the screen edges */}
-                            <View style={styles.mapBgBleed}>
-                                <RoadmapBgDecor isCG={isControlGroup} w={width} h={mapHeight} />
+                            {/* Illustrated journey map (scenery + road); the interactive stops
+                                and labels below are positioned on top of it. */}
+                            <View style={styles.mapBgBleed} pointerEvents="none">
+                                <RoadmapScene
+                                    width={sceneWidth}
+                                    height={mapHeight}
+                                    points={scenePoints}
+                                    completed={stepCompleted}
+                                    offsetX={MAP_BLEED}
+                                />
                             </View>
 
-                            <Svg
-                                width={mapWidth}
-                                height={mapHeight}
-                                viewBox={`0 0 ${mapWidth} ${mapHeight}`}
-                                style={styles.mapSvg}
-                            >
-                                <Defs>
-                                    <SvgLinearGradient id="pathGrad" x1="0" y1="0" x2="0" y2="1">
-                                        <Stop offset="0" stopColor={Colors.tasks.daily.ink} stopOpacity="0.85" />
-                                        <Stop offset="0.25" stopColor={Colors.tasks.weekly.ink} stopOpacity="0.85" />
-                                        <Stop offset="0.5" stopColor={Colors.tasks.thrive.ink} stopOpacity="0.85" />
-                                        <Stop offset="0.75" stopColor={Colors.tasks.stress.ink} stopOpacity="0.85" />
-                                        <Stop offset="1" stopColor={Colors.tasks.mindful.ink} stopOpacity="0.85" />
-                                    </SvgLinearGradient>
-                                </Defs>
-                                <Path
-                                    d={pathD}
-                                    stroke="url(#pathGrad)"
-                                    strokeWidth="8"
-                                    strokeLinecap="round"
-                                    opacity="0.12"
-                                    fill="none"
-                                />
-                                <Path
-                                    d={pathD}
-                                    stroke="url(#pathGrad)"
-                                    strokeWidth="3.5"
-                                    fill="none"
-                                    strokeDasharray="8 6"
-                                    strokeLinecap="round"
-                                />
-                            </Svg>
-
-                            {renderNode(0, 30, undefined, 24)}
-                            {renderNode(1, 130, 24)}
-                            {renderNode(2, 230, undefined, 24)}
-                            {renderNode(3, 330, 24)}
-                            {renderNode(4, 430, undefined, 24)}
+                            {NODE_TOPS.map((top, i) => (
+                                <React.Fragment key={i}>
+                                    {i % 2 === 0
+                                        ? renderNode(i, top, undefined, NODE_INSET)
+                                        : renderNode(i, top, NODE_INSET)}
+                                </React.Fragment>
+                            ))}
                         </View>
 
                         {/* Wave decoration matching Signup bottom panel */}
@@ -874,13 +836,8 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 0,
         bottom: 0,
-        left: -24,
-        right: -24,
-    },
-    mapSvg: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
+        left: -20,
+        right: -20,
     },
     mapNode: {
         position: 'absolute',
@@ -908,8 +865,10 @@ const styles = StyleSheet.create({
         borderRadius: 28,
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 2,
-        ...cardShadow,
+        // Cartoon badge: thick white outline over the illustrated map.
+        borderWidth: 4,
+        borderColor: Colors.white,
+        ...cardShadowElevated,
         backgroundColor: Colors.surface,
     },
     nodeCircleCompleted: {

@@ -51,7 +51,9 @@ export const JourneyIcons = {
     Chart: ({ width = 40, height = 40, color = Colors.tasks.thrive.ink }: IconProps) => (
         <Svg width={width} height={height} viewBox="0 0 24 24" fill="none">
             <Defs>
-                <LinearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                {/* userSpaceOnUse: the bars are perfectly vertical lines, whose bounding box has
+                    zero width, so a default (objectBoundingBox) gradient stroke would not render. */}
+                <LinearGradient id="chartGrad" x1="0" y1="4" x2="0" y2="20" gradientUnits="userSpaceOnUse">
                     <Stop offset="0" stopColor={color} stopOpacity="0.45" />
                     <Stop offset="1" stopColor={color} stopOpacity="0.85" />
                 </LinearGradient>
