@@ -142,7 +142,7 @@ export default function ForgotPasswordScreen() {
                         style={[styles.bottomPanel, panelStyle, { minHeight: height - headerHeight, paddingBottom: insets.bottom }]}
                     >
                         <Text style={styles.panelTitle}>RESET PASSWORD</Text>
-                        <Text style={styles.panelSubtitle}>WE'LL EMAIL YOU A CODE</Text>
+                        <Text style={styles.panelSubtitle}>WE&apos;LL EMAIL YOU A CODE</Text>
 
                         <View style={styles.formContainer}>
                             <View style={styles.inputWrapper}>

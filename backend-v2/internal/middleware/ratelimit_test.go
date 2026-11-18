@@ -14,7 +14,7 @@ import (
 func newLimitedRouter(limit int64) *gin.Engine {
 	l := limiter.New(limitermemory.NewStore(), limiter.Rate{Period: 15 * time.Minute, Limit: limit})
 	r := gin.New()
-	r.GET("/limited", RateLimit(l, "Too many requests. Please slow down."), func(c *gin.Context) {
+	r.GET("/limited", RateLimit(l, "Too many requests. Please slow down.", ClientIPResolver(0)), func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ok": true})
 	})
 	return r
@@ -105,8 +105,8 @@ func TestRateLimit_IndependentLimitersDoNotShareBuckets(t *testing.T) {
 	apiLimiter := limiter.New(limitermemory.NewStore(), limiter.Rate{Period: 15 * time.Minute, Limit: 1})
 
 	r := gin.New()
-	r.GET("/auth", RateLimit(authLimiter, "auth limited"), func(c *gin.Context) { c.Status(http.StatusOK) })
-	r.GET("/api", RateLimit(apiLimiter, "api limited"), func(c *gin.Context) { c.Status(http.StatusOK) })
+	r.GET("/auth", RateLimit(authLimiter, "auth limited", ClientIPResolver(0)), func(c *gin.Context) { c.Status(http.StatusOK) })
+	r.GET("/api", RateLimit(apiLimiter, "api limited", ClientIPResolver(0)), func(c *gin.Context) { c.Status(http.StatusOK) })
 
 	ip := "203.0.113.5:1"
 

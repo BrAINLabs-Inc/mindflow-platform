@@ -65,8 +65,127 @@ func (q *Queries) GetResearchID(ctx context.Context, id pgtype.UUID) (pgtype.Tex
 	return research_id, err
 }
 
-const upsertProfileUsername = `-- name: UpsertProfileUsername :exec
+const upsertAboutMe = `-- name: UpsertAboutMe :one
+INSERT INTO about_me_profiles (
+    id, university_id, education_level, faculty, major_field_of_study, age, living_situation, family_background, cultural_background, hobbies_interests, personal_goals, why_mindflow, is_completed, updated_at
+) VALUES (
+    $1,
+    CASE WHEN $2::bool THEN $3::text END,
+    CASE WHEN $4::bool THEN $5::text END,
+    CASE WHEN $6::bool THEN $7::text END,
+    CASE WHEN $8::bool THEN $9::text END,
+    CASE WHEN $10::bool THEN $11::int4 END,
+    CASE WHEN $12::bool THEN $13::text END,
+    CASE WHEN $14::bool THEN $15::text END,
+    CASE WHEN $16::bool THEN $17::text END,
+    CASE WHEN $18::bool THEN $19::text END,
+    CASE WHEN $20::bool THEN $21::text END,
+    CASE WHEN $22::bool THEN $23::text END,
+    CASE WHEN $24::bool THEN $25::bool ELSE FALSE END,
+    NOW()
+)
+ON CONFLICT (id) DO UPDATE SET
+    university_id = CASE WHEN $2::bool THEN EXCLUDED.university_id ELSE about_me_profiles.university_id END,
+    education_level = CASE WHEN $4::bool THEN EXCLUDED.education_level ELSE about_me_profiles.education_level END,
+    faculty = CASE WHEN $6::bool THEN EXCLUDED.faculty ELSE about_me_profiles.faculty END,
+    major_field_of_study = CASE WHEN $8::bool THEN EXCLUDED.major_field_of_study ELSE about_me_profiles.major_field_of_study END,
+    age = CASE WHEN $10::bool THEN EXCLUDED.age ELSE about_me_profiles.age END,
+    living_situation = CASE WHEN $12::bool THEN EXCLUDED.living_situation ELSE about_me_profiles.living_situation END,
+    family_background = CASE WHEN $14::bool THEN EXCLUDED.family_background ELSE about_me_profiles.family_background END,
+    cultural_background = CASE WHEN $16::bool THEN EXCLUDED.cultural_background ELSE about_me_profiles.cultural_background END,
+    hobbies_interests = CASE WHEN $18::bool THEN EXCLUDED.hobbies_interests ELSE about_me_profiles.hobbies_interests END,
+    personal_goals = CASE WHEN $20::bool THEN EXCLUDED.personal_goals ELSE about_me_profiles.personal_goals END,
+    why_mindflow = CASE WHEN $22::bool THEN EXCLUDED.why_mindflow ELSE about_me_profiles.why_mindflow END,
+    is_completed = CASE WHEN $24::bool THEN EXCLUDED.is_completed ELSE about_me_profiles.is_completed END,
+    updated_at = NOW()
+RETURNING id, university_id, education_level, faculty, major_field_of_study, age, living_situation, family_background, cultural_background, hobbies_interests, personal_goals, why_mindflow, is_completed, created_at, updated_at
+`
 
+type UpsertAboutMeParams struct {
+	ID                    pgtype.UUID `json:"id"`
+	SetUniversityID       bool        `json:"set_university_id"`
+	UniversityID          pgtype.Text `json:"university_id"`
+	SetEducationLevel     bool        `json:"set_education_level"`
+	EducationLevel        pgtype.Text `json:"education_level"`
+	SetFaculty            bool        `json:"set_faculty"`
+	Faculty               pgtype.Text `json:"faculty"`
+	SetMajorFieldOfStudy  bool        `json:"set_major_field_of_study"`
+	MajorFieldOfStudy     pgtype.Text `json:"major_field_of_study"`
+	SetAge                bool        `json:"set_age"`
+	Age                   pgtype.Int4 `json:"age"`
+	SetLivingSituation    bool        `json:"set_living_situation"`
+	LivingSituation       pgtype.Text `json:"living_situation"`
+	SetFamilyBackground   bool        `json:"set_family_background"`
+	FamilyBackground      pgtype.Text `json:"family_background"`
+	SetCulturalBackground bool        `json:"set_cultural_background"`
+	CulturalBackground    pgtype.Text `json:"cultural_background"`
+	SetHobbiesInterests   bool        `json:"set_hobbies_interests"`
+	HobbiesInterests      pgtype.Text `json:"hobbies_interests"`
+	SetPersonalGoals      bool        `json:"set_personal_goals"`
+	PersonalGoals         pgtype.Text `json:"personal_goals"`
+	SetWhyMindflow        bool        `json:"set_why_mindflow"`
+	WhyMindflow           pgtype.Text `json:"why_mindflow"`
+	SetIsCompleted        bool        `json:"set_is_completed"`
+	IsCompleted           bool        `json:"is_completed"`
+}
+
+// POST /api/profile/about-me (profileService.ts updateAboutMe). Partial-upsert
+// semantics, matching PostgREST's upsert of an allowlisted payload: only
+// fields present in the request body (set_<field> = true) are written --
+// an explicit null clears the column, an absent field keeps its stored
+// value on update and gets the column default on insert (NULL for the
+// text/int fields, FALSE for is_completed). updated_at is always bumped,
+// as the TS source sets it explicitly on every call.
+func (q *Queries) UpsertAboutMe(ctx context.Context, arg UpsertAboutMeParams) (AboutMeProfile, error) {
+	row := q.db.QueryRow(ctx, upsertAboutMe,
+		arg.ID,
+		arg.SetUniversityID,
+		arg.UniversityID,
+		arg.SetEducationLevel,
+		arg.EducationLevel,
+		arg.SetFaculty,
+		arg.Faculty,
+		arg.SetMajorFieldOfStudy,
+		arg.MajorFieldOfStudy,
+		arg.SetAge,
+		arg.Age,
+		arg.SetLivingSituation,
+		arg.LivingSituation,
+		arg.SetFamilyBackground,
+		arg.FamilyBackground,
+		arg.SetCulturalBackground,
+		arg.CulturalBackground,
+		arg.SetHobbiesInterests,
+		arg.HobbiesInterests,
+		arg.SetPersonalGoals,
+		arg.PersonalGoals,
+		arg.SetWhyMindflow,
+		arg.WhyMindflow,
+		arg.SetIsCompleted,
+		arg.IsCompleted,
+	)
+	var i AboutMeProfile
+	err := row.Scan(
+		&i.ID,
+		&i.UniversityID,
+		&i.EducationLevel,
+		&i.Faculty,
+		&i.MajorFieldOfStudy,
+		&i.Age,
+		&i.LivingSituation,
+		&i.FamilyBackground,
+		&i.CulturalBackground,
+		&i.HobbiesInterests,
+		&i.PersonalGoals,
+		&i.WhyMindflow,
+		&i.IsCompleted,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const upsertProfileUsername = `-- name: UpsertProfileUsername :exec
 INSERT INTO profiles (id, username) VALUES ($1, $2)
 ON CONFLICT (id) DO UPDATE SET username = EXCLUDED.username
 `
@@ -76,12 +195,6 @@ type UpsertProfileUsernameParams struct {
 	Username pgtype.Text `json:"username"`
 }
 
-// POST /api/profile/about-me (updateAboutMe) is a write endpoint, out of
-// scope for the read-only phase-2 pass -- see plan §2. Its partial-upsert
-// semantics (only fields present in the request body get overwritten,
-// everything else keeps its previous value) don't map onto a single
-// fixed-column sqlc query anyway; it needs a dynamically built UPDATE SET
-// clause, ported when the write endpoints land.
 // Signup's initial username assignment. Only touches username -- never
 // research_id (that's researcher-assigned only, never set at signup --
 // see CLAUDE.md's research-group note). A collision with another user's

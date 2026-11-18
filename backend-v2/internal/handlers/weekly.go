@@ -120,7 +120,7 @@ func (h *WeeklyHandler) UploadAudio(c *gin.Context) {
 		return
 	}
 
-	result, err := h.svc.UploadAudio(c.Request.Context(), userID, file, mime)
+	result, err := h.svc.UploadAudio(c.Request.Context(), userID, file, storedContentType(mime, name))
 	if err != nil {
 		log.Printf("uploadAudio: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
@@ -178,4 +178,32 @@ func (h *WeeklyHandler) SubmitEntry(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, result)
+}
+
+// audioMimeByExt maps the extension allowlist to the Content-Type stored
+// for the object when the client's declared MIME type isn't itself an
+// allowlisted audio type.
+var audioMimeByExt = map[string]string{
+	".wav":  "audio/wav",
+	".mp3":  "audio/mpeg",
+	".m4a":  "audio/mp4",
+	".webm": "audio/webm",
+	".ogg":  "audio/ogg",
+}
+
+// storedContentType decides the Content-Type the R2 object is served
+// with. The upload is accepted if EITHER the declared MIME type OR the
+// filename extension is allowlisted, so the declared type alone can't be
+// trusted: "x.wav" declared as text/html would otherwise be stored -- and
+// served from the public bucket -- as HTML (stored XSS on the R2 domain).
+func storedContentType(declaredMime, lowerFilename string) string {
+	if allowedAudioMimes[declaredMime] {
+		return declaredMime
+	}
+	if m := allowedAudioExt.FindString(lowerFilename); m != "" {
+		if ct, ok := audioMimeByExt[strings.ToLower(m)]; ok {
+			return ct
+		}
+	}
+	return "application/octet-stream"
 }

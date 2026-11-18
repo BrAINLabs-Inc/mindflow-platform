@@ -35,11 +35,15 @@ Executed inline against this plan, in `backend-v2/`, verified end-to-end against
   2. `pgtype.Time` (the Go type for the `event_time TIME` column) has no `MarshalJSON`, unlike every other `pgtype` field used — it was leaking its internal `{Microseconds, Valid}` struct into the calendar API response. Fixed with a proper response DTO (`db.FormatTime`).
 - **Testing, built alongside every phase above rather than deferred**: golden-value unit tests for `timeutil`/`researchgroup` (values captured by actually running the original TS under `ts-node`), JWT verification tests against a real `httptest` JWKS server, `RequireAuth`/`RequireAdmin` and every service/handler layer tested against real `testcontainers-go` Postgres instances (not mocks), full request/response handler tests for the auth flows and multipart weekly upload, and rate-limit bucket-isolation tests.
 
+### Audit fixes (2026-11-18)
+
+A parity/security audit (`FINDINGS_AND_DEVELOPMENT.md`) found and fixed: `POST /api/profile/about-me` had never been ported (onboarding would have broken at cutover); daily-entry `""`/`0` weren't normalised to `NULL` like Express; spoofable `X-Forwarded-For` defeated both rate limiters; no 1 MB JSON body cap; no HTTP server timeouts; cron jobs would double-send per replica. Shared with `backend/`: client-controlled upload Content-Type and unverified weekly `file_url`.
+
 ### Not yet done
 
 - **Phase 7 (parity + load testing)**: the coverage-parity checklist in §7 (mapped from the current 11 Jest files / 105 tests) hasn't been formally cross-checked item-by-item against what's been ported; `backend/loadtest/*.yml` hasn't been copied into `backend-v2/loadtest/` or run against it.
 - **§6 OpenAPI / Swagger**: no `backend-v2/api/openapi.yaml` authored yet, no `oapi-codegen` wiring, no `backend-v2/scripts/parity-check` script.
-- **§8 CI integration**: no `backend-v2` job added to `.github/workflows/ci.yml` yet. Note when this lands: `go.mod`'s `go` directive is `1.25.0` (one of the dependencies required it), not the `1.23` this section originally specified — the CI job's `go-version` needs to reflect that.
+- ~~**§8 CI integration**~~: done 2026-11-18 — `backend-v2` job in `ci.yml` (gofmt, vet, sqlc drift check, build, test), using `go-version-file` so it tracks `go.mod`'s `1.25.0` directive.
 - **§9 Cutover**: not started, and shouldn't be until the parity gate above is actually met — this is the highest-blast-radius phase (staging deploy, production env-var flip, eventual deletion of `backend/`) and also needs real Supabase/R2 credentials and a real deployment target that don't exist in this environment.
 
 

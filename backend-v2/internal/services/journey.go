@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/jackc/pgx/v5/pgtype"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/BrAINLabs-Inc/mindflow-platform/backend-v2/internal/db/queries"
 )
@@ -117,27 +118,39 @@ type JourneyResearch struct {
 // GetJourneyData returns full journey history for admin/web dashboard
 // consumption, capped at limit rows per feature domain.
 func (s *JourneyService) GetJourneyData(ctx context.Context, userID pgtype.UUID, limit int32) (JourneyData, error) {
-	daily, err := s.q.ListJourneyDaily(ctx, queries.ListJourneyDailyParams{UserID: userID, Limit: limit})
-	if err != nil {
+	// Five independent reads, run concurrently like the TS source's
+	// Promise.all; any failure fails the request.
+	var (
+		daily    []queries.ListJourneyDailyRow
+		weekly   []queries.ListJourneyWeeklyRow
+		pss10    []queries.ListJourneyStressRow
+		ffmq15   []queries.ListJourneyMindfulRow
+		wemwbs14 []queries.ListJourneyThriveRow
+	)
+	g, gctx := errgroup.WithContext(ctx)
+	g.Go(func() (err error) {
+		daily, err = s.q.ListJourneyDaily(gctx, queries.ListJourneyDailyParams{UserID: userID, Limit: limit})
+		return err
+	})
+	g.Go(func() (err error) {
+		weekly, err = s.q.ListJourneyWeekly(gctx, queries.ListJourneyWeeklyParams{UserID: userID, Limit: limit})
+		return err
+	})
+	g.Go(func() (err error) {
+		pss10, err = s.q.ListJourneyStress(gctx, queries.ListJourneyStressParams{UserID: userID, Limit: limit})
+		return err
+	})
+	g.Go(func() (err error) {
+		ffmq15, err = s.q.ListJourneyMindful(gctx, queries.ListJourneyMindfulParams{UserID: userID, Limit: limit})
+		return err
+	})
+	g.Go(func() (err error) {
+		wemwbs14, err = s.q.ListJourneyThrive(gctx, queries.ListJourneyThriveParams{UserID: userID, Limit: limit})
+		return err
+	})
+	if err := g.Wait(); err != nil {
 		return JourneyData{}, err
 	}
-	weekly, err := s.q.ListJourneyWeekly(ctx, queries.ListJourneyWeeklyParams{UserID: userID, Limit: limit})
-	if err != nil {
-		return JourneyData{}, err
-	}
-	pss10, err := s.q.ListJourneyStress(ctx, queries.ListJourneyStressParams{UserID: userID, Limit: limit})
-	if err != nil {
-		return JourneyData{}, err
-	}
-	ffmq15, err := s.q.ListJourneyMindful(ctx, queries.ListJourneyMindfulParams{UserID: userID, Limit: limit})
-	if err != nil {
-		return JourneyData{}, err
-	}
-	wemwbs14, err := s.q.ListJourneyThrive(ctx, queries.ListJourneyThriveParams{UserID: userID, Limit: limit})
-	if err != nil {
-		return JourneyData{}, err
-	}
-
 	// sqlc returns a nil slice for zero rows, which json.Marshal renders
 	// as `null`; the TS source always falls back to `[]` (`data || []`),
 	// so empty results are coalesced the same way here.

@@ -10,15 +10,15 @@ import (
 )
 
 // RateLimit builds Gin middleware around an ulule/limiter instance, keyed
-// by client IP (matching express-rate-limit's default keying -- Gin's
-// c.ClientIP() respects the same trusted-proxy configuration as app.ts's
-// `trust proxy` setting). Emits the "RateLimit-*" standard headers
+// by client IP (matching express-rate-limit's default keying; keyFn must
+// apply app.ts's `trust proxy` semantics -- see ClientIPResolver). Emits the "RateLimit-*" standard headers
 // (RateLimit-Limit, RateLimit-Remaining, RateLimit-Reset as
 // seconds-until-reset), not the deprecated "X-RateLimit-*" ones -- matches
 // app.ts's standardHeaders:true, legacyHeaders:false. See plan §4.
-func RateLimit(l *limiter.Limiter, message string) gin.HandlerFunc {
+// keyFn resolves the client identity (see ClientIPResolver).
+func RateLimit(l *limiter.Limiter, message string, keyFn func(*gin.Context) string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		result, err := l.Get(c.Request.Context(), c.ClientIP())
+		result, err := l.Get(c.Request.Context(), keyFn(c))
 		if err != nil {
 			// Fail open: a limiter-store error must not block real traffic.
 			c.Next()

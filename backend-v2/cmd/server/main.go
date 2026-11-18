@@ -10,6 +10,9 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+	// Embeds the IANA tz database so time.LoadLocation("Asia/Colombo") in
+	// the reminder scheduler works on minimal images without tzdata.
+	_ "time/tzdata"
 
 	"github.com/gin-contrib/cors"
 	secure "github.com/gin-contrib/secure"
@@ -65,13 +68,13 @@ func main() {
 	router := gin.New()
 	router.Use(gin.Logger(), gin.CustomRecovery(appmiddleware.Recovery))
 
-	// Trusts one reverse-proxy hop by default, matching app.ts's
-	// `app.set('trust proxy', ...)` — adjust TRUST_PROXY_HOPS if that
-	// topology changes. Gin has no direct "N hops" concept, so this is
-	// approximated as "trust no proxies" (hops <= 0) or "trust all"
-	// otherwise; revisit once the real deployment topology is known.
-	if cfg.TrustProxyHops <= 0 {
-		router.SetTrustedProxies(nil)
+	// Gin's proxy trust is disabled outright: its default ("trust all")
+	// makes c.ClientIP() return the client-chosen left-most
+	// X-Forwarded-For entry. app.ts's `trust proxy = TRUST_PROXY_HOPS`
+	// semantics are reproduced exactly by appmiddleware.ClientIPResolver,
+	// which keys the rate limiters below.
+	if err := router.SetTrustedProxies(nil); err != nil {
+		log.Fatalf("trusted proxies: %v", err)
 	}
 
 	router.Use(secure.New(secure.Config{
@@ -100,14 +103,21 @@ func main() {
 
 	router.NoRoute(appmiddleware.NotFound)
 
-	scheduler, err := jobs.StartReminderScheduler(notificationSvc)
+	scheduler, err := jobs.StartReminderScheduler(notificationSvc, pool)
 	if err != nil {
 		log.Fatalf("scheduler: %v", err)
 	}
 
+	// Timeouts guard against slow-loris style connection exhaustion. The
+	// read/write budgets leave room for a 10MB weekly audio upload on a
+	// slow mobile connection.
 	srv := &http.Server{
-		Addr:    ":" + cfg.Port,
-		Handler: router,
+		Addr:              ":" + cfg.Port,
+		Handler:           router,
+		ReadHeaderTimeout: 10 * time.Second,
+		ReadTimeout:       2 * time.Minute,
+		WriteTimeout:      2 * time.Minute,
+		IdleTimeout:       2 * time.Minute,
 	}
 
 	go func() {
@@ -187,14 +197,20 @@ func registerRoutes(router *gin.Engine, pool *pgxpool.Pool, verifier *auth.Verif
 	// single instance; horizontal scaling would need a shared store
 	// (e.g. Redis, which ulule/limiter also supports) to rate-limit
 	// across instances instead of per-instance.
+	clientIP := appmiddleware.ClientIPResolver(cfg.TrustProxyHops)
 	authLimiter := appmiddleware.RateLimit(
 		limiter.New(limitermemory.NewStore(), limiter.Rate{Period: 15 * time.Minute, Limit: 20}),
 		"Too many attempts. Please try again after 15 minutes.",
+		clientIP,
 	)
 	apiLimiter := appmiddleware.RateLimit(
 		limiter.New(limitermemory.NewStore(), limiter.Rate{Period: 15 * time.Minute, Limit: 300}),
 		"Too many requests. Please slow down.",
+		clientIP,
 	)
+	// express.json({ limit: '1mb' }) equivalent. Applied per route rather
+	// than globally so the multipart upload keeps its own 10MB cap.
+	jsonLimit := appmiddleware.BodyLimit(appmiddleware.JSONBodyLimit)
 
 	// Routes are registered as exact full paths rather than via
 	// sub-groups with a "/" relative pattern -- a Gin group.GET("/", ...)
@@ -213,6 +229,7 @@ func registerRoutes(router *gin.Engine, pool *pgxpool.Pool, verifier *auth.Verif
 
 	api.GET("/profile", apiLimiter, requireAuth, profileHandler.GetProfile)
 	api.GET("/profile/about-me", apiLimiter, requireAuth, profileHandler.GetAboutMe)
+	api.POST("/profile/about-me", apiLimiter, jsonLimit, requireAuth, profileHandler.UpdateAboutMe)
 
 	api.GET("/calendar/events", apiLimiter, requireAuth, calendarHandler.GetEvents)
 	// Canonical duplicate path for web clients -- see roadmapRoutes.ts.
@@ -220,39 +237,39 @@ func registerRoutes(router *gin.Engine, pool *pgxpool.Pool, verifier *auth.Verif
 
 	// Daily Sliders
 	api.GET("/roadmap/daily/status", apiLimiter, requireAuth, dailyHandler.GetStatus)
-	api.POST("/roadmap/daily/video-progress", apiLimiter, requireAuth, dailyHandler.UpdateVideoProgress)
-	api.POST("/roadmap/daily", apiLimiter, requireAuth, dailyHandler.SubmitEntry)
+	api.POST("/roadmap/daily/video-progress", apiLimiter, jsonLimit, requireAuth, dailyHandler.UpdateVideoProgress)
+	api.POST("/roadmap/daily", apiLimiter, jsonLimit, requireAuth, dailyHandler.SubmitEntry)
 
 	// Thrive Tracker (WEMWBS-14)
 	api.GET("/roadmap/thrive/status", apiLimiter, requireAuth, thriveHandler.GetStatus)
-	api.POST("/roadmap/thrive", apiLimiter, requireAuth, thriveHandler.SubmitEntry)
+	api.POST("/roadmap/thrive", apiLimiter, jsonLimit, requireAuth, thriveHandler.SubmitEntry)
 
 	// Stress Snapshot (PSS-10)
 	api.GET("/roadmap/stress/status", apiLimiter, requireAuth, stressHandler.GetStatus)
-	api.POST("/roadmap/stress", apiLimiter, requireAuth, stressHandler.SubmitEntry)
+	api.POST("/roadmap/stress", apiLimiter, jsonLimit, requireAuth, stressHandler.SubmitEntry)
 
 	// Mindful Mirror (FFMQ-15)
 	api.GET("/roadmap/mindful/status", apiLimiter, requireAuth, mindfulHandler.GetStatus)
-	api.POST("/roadmap/mindful", apiLimiter, requireAuth, mindfulHandler.SubmitEntry)
+	api.POST("/roadmap/mindful", apiLimiter, jsonLimit, requireAuth, mindfulHandler.SubmitEntry)
 
 	// Weekly Whispers
 	api.GET("/roadmap/weekly/status", apiLimiter, requireAuth, weeklyHandler.GetStatus)
 	api.GET("/roadmap/weekly/video", apiLimiter, requireAuth, weeklyHandler.GetVideo)
 	api.POST("/roadmap/weekly/upload", apiLimiter, requireAuth, weeklyHandler.UploadAudio)
-	api.POST("/roadmap/weekly", apiLimiter, requireAuth, weeklyHandler.SubmitEntry)
+	api.POST("/roadmap/weekly", apiLimiter, jsonLimit, requireAuth, weeklyHandler.SubmitEntry)
 
 	// Auth flows are unauthenticated by definition (they're how a client
 	// gets a token in the first place) -- no requireAuth here.
-	api.POST("/auth/signup", authLimiter, authHandler.Signup)
-	api.POST("/auth/login", authLimiter, authHandler.Login)
-	api.POST("/auth/verify-otp", authLimiter, authHandler.VerifyOtp)
-	api.POST("/auth/resend-otp", authLimiter, authHandler.ResendOtp)
-	api.POST("/auth/reset-password", authLimiter, authHandler.ResetPassword)
-	api.POST("/auth/confirm-reset", authLimiter, authHandler.ConfirmPasswordReset)
-	api.POST("/auth/refresh", authLimiter, authHandler.RefreshToken)
+	api.POST("/auth/signup", authLimiter, jsonLimit, authHandler.Signup)
+	api.POST("/auth/login", authLimiter, jsonLimit, authHandler.Login)
+	api.POST("/auth/verify-otp", authLimiter, jsonLimit, authHandler.VerifyOtp)
+	api.POST("/auth/resend-otp", authLimiter, jsonLimit, authHandler.ResendOtp)
+	api.POST("/auth/reset-password", authLimiter, jsonLimit, authHandler.ResetPassword)
+	api.POST("/auth/confirm-reset", authLimiter, jsonLimit, authHandler.ConfirmPasswordReset)
+	api.POST("/auth/refresh", authLimiter, jsonLimit, authHandler.RefreshToken)
 
-	api.POST("/notifications/register-token", apiLimiter, requireAuth, notificationHandler.RegisterToken)
-	api.POST("/notifications/unregister-token", apiLimiter, requireAuth, notificationHandler.UnregisterToken)
+	api.POST("/notifications/register-token", apiLimiter, jsonLimit, requireAuth, notificationHandler.RegisterToken)
+	api.POST("/notifications/unregister-token", apiLimiter, jsonLimit, requireAuth, notificationHandler.UnregisterToken)
 
 	return notificationSvc
 }

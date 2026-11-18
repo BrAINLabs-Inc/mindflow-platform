@@ -91,5 +91,11 @@ func (c *Client) Upload(ctx context.Context, key string, body io.Reader, content
 		return UploadResult{}, fmt.Errorf("uploading to R2: %w", err)
 	}
 
-	return UploadResult{FileKey: key, FileURL: c.publicURLBase + "/" + key}, nil
+	return UploadResult{FileKey: key, FileURL: c.PublicURL(key)}, nil
+}
+
+// PublicURL is the public URL an object uploaded under key is served from.
+// SubmitWeeklyEntry checks client-supplied file_url values against it.
+func (c *Client) PublicURL(key string) string {
+	return c.publicURLBase + "/" + key
 }

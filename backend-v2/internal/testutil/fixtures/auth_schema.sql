@@ -10,13 +10,14 @@ CREATE TABLE IF NOT EXISTS auth.users (
     id UUID PRIMARY KEY
 );
 
--- Real auth.uid() reads the JWT claims of the current PostgREST/Supabase
--- request. backend-v2 never runs as this role (it connects with its own
--- least-privilege role and does its own application-level `WHERE user_id
--- = $1` filtering -- see plan §3), so a constant NULL is sufficient: it
--- only needs to exist for CREATE POLICY's expressions to resolve.
+-- Mirrors Supabase's auth.uid(): the `sub` claim of the current
+-- PostgREST request, NULL when there is none. backend-v2's own connections
+-- never set it (it does its own application-level `WHERE user_id = $1`
+-- filtering -- see plan §3), so it is NULL for them, exactly as for the
+-- service role in production. RLS/trigger tests set it per transaction
+-- with set_config('request.jwt.claim.sub', ...) to act as a participant.
 CREATE OR REPLACE FUNCTION auth.uid() RETURNS UUID AS $$
-    SELECT NULL::UUID;
+    SELECT NULLIF(current_setting('request.jwt.claim.sub', true), '')::UUID;
 $$ LANGUAGE sql STABLE;
 
 DO $$
@@ -26,3 +27,5 @@ BEGIN
     END IF;
 END
 $$;
+
+GRANT USAGE ON SCHEMA auth TO authenticated;

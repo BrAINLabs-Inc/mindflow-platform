@@ -10,6 +10,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 
+	"github.com/BrAINLabs-Inc/mindflow-platform/backend-v2/internal/r2"
 	"github.com/BrAINLabs-Inc/mindflow-platform/backend-v2/internal/services"
 	"github.com/BrAINLabs-Inc/mindflow-platform/backend-v2/internal/testutil"
 	"github.com/BrAINLabs-Inc/mindflow-platform/backend-v2/internal/timeutil"
@@ -21,6 +22,47 @@ func weeklyKeyForTest(year, week int, userID string) string {
 	return fmt.Sprintf("WeeklyVoice/weekly-%d-W%02d-%s.wav", year, week, userID)
 }
 
+// testR2 builds an R2 client that is never contacted -- SubmitWeeklyEntry
+// only needs its PublicURL derivation.
+func testR2(t *testing.T) *r2.Client {
+	t.Helper()
+	c, err := r2.New(context.Background(), "acct", "key", "secret", "bucket", "https://cdn.example.com")
+	if err != nil {
+		t.Fatalf("r2.New: %v", err)
+	}
+	return c
+}
+
+func TestSubmitWeeklyEntry_FileURLMustMatchKey(t *testing.T) {
+	pool, q := testutil.NewTestDB(t)
+	ctx := context.Background()
+	userID := uuid.New()
+	pgUserID := pgtype.UUID{Bytes: userID, Valid: true}
+	if _, err := pool.Exec(ctx, `INSERT INTO auth.users (id) VALUES ($1)`, userID); err != nil {
+		t.Fatalf("seeding user: %v", err)
+	}
+	svc := services.NewWeeklyService(q, testR2(t))
+	year, week := timeutil.GetISOWeekNumber(time.Now())
+	fileKey := weeklyKeyForTest(year, week, userID.String())
+
+	for _, badURL := range []string{
+		"javascript:alert(document.cookie)",
+		"https://phish.example.net/" + fileKey,
+		"https://cdn.example.com/WeeklyVoice/other.wav",
+	} {
+		if _, err := svc.SubmitWeeklyEntry(ctx, pgUserID, badURL, fileKey, nil); !errors.Is(err, services.ErrWeeklyFileKeyMismatch) {
+			t.Errorf("file_url %q: error = %v, want ErrWeeklyFileKeyMismatch", badURL, err)
+		}
+	}
+	var n int
+	if err := pool.QueryRow(ctx, `SELECT COUNT(*) FROM voice_recordings WHERE user_id = $1`, userID).Scan(&n); err != nil {
+		t.Fatalf("counting rows: %v", err)
+	}
+	if n != 0 {
+		t.Errorf("rows = %d, want 0 (mismatched URLs must not be stored)", n)
+	}
+}
+
 func TestSubmitWeeklyEntry_KeyMismatchRejected(t *testing.T) {
 	pool, q := testutil.NewTestDB(t)
 	ctx := context.Background()
@@ -30,7 +72,7 @@ func TestSubmitWeeklyEntry_KeyMismatchRejected(t *testing.T) {
 		t.Fatalf("seeding user: %v", err)
 	}
 
-	svc := services.NewWeeklyService(q, nil) // SubmitWeeklyEntry never touches R2
+	svc := services.NewWeeklyService(q, testR2(t))
 
 	_, err := svc.SubmitWeeklyEntry(ctx, pgUserID, "https://cdn.example.com/somewhere-else.wav", "WeeklyVoice/weekly-2000-W01-someone-elses-id.wav", nil)
 	if !errors.Is(err, services.ErrWeeklyFileKeyMismatch) {
@@ -47,7 +89,7 @@ func TestSubmitWeeklyEntry_UpsertsOnMatchingKey(t *testing.T) {
 		t.Fatalf("seeding user: %v", err)
 	}
 
-	svc := services.NewWeeklyService(q, nil)
+	svc := services.NewWeeklyService(q, testR2(t))
 	year, week := timeutil.GetISOWeekNumber(time.Now())
 	fileKey := weeklyKeyForTest(year, week, userID.String())
 	duration := int32(42)

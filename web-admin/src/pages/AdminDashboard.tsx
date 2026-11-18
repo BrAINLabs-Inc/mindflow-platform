@@ -29,6 +29,7 @@ import { useNavigate } from 'react-router-dom';
 import { TABLES_CONFIG } from '@/lib/tableConfig';
 import { fetchOverviewMetrics, fetchFilteredTablePage } from '@/lib/adminData';
 import { useUserMap } from '@/hooks/useUserMap';
+import { neutralizeCsvFormula } from '@/lib/csv';
 import { CrudModal } from '@/components/admin/CrudModal';
 import { WeeklyVideosTab } from '@/components/admin/WeeklyVideosTab';
 import { CalendarTab } from '@/components/admin/CalendarTab';
@@ -50,6 +51,9 @@ interface AnalyticsSnapshot {
     wemwbs14: Array<{ user_id: string; q1: number; q2: number; q3: number; q4: number; q5: number; q6: number; q7: number; q8: number; q9: number; q10: number; q11: number; q12: number; q13: number; q14: number }>;
     ffmq15: Array<{ user_id: string; observing_score: number; describing_score: number; awareness_score: number; non_judging_score: number; non_reactivity_score: number }>;
 }
+
+// Matches PostgREST's default max-rows, so each page is a full server response.
+const ANALYTICS_PAGE_SIZE = 1000;
 
 const EMPTY_ANALYTICS: AnalyticsSnapshot = {
     dailySliders: [], voiceRecordings: [], calendarEvents: [],
@@ -188,27 +192,42 @@ export default function AdminDashboard() {
             const startStr = startDate.toISOString();
             const endStr = tf === 'custom' && customEnd ? customEnd + 'T23:59:59.999Z' : undefined;
 
-            const buildQ = (table: string) => {
-                const q = supabase.from(table).select('*').gte('created_at', startStr).order('created_at', { ascending: true });
-                return endStr ? q.lte('created_at', endStr) : q;
+            // Paged rather than one select per table: PostgREST silently caps a single
+            // response at its max-rows setting (1000 by default), which a 30-day window of
+            // daily_sliders already exceeds at study scale — every chart would under-report.
+            // The (created_at, primary key) ordering keeps pages stable.
+            const fetchAll = async (table: string, primaryKey: string): Promise<unknown[]> => {
+                const rows: unknown[] = [];
+                for (let from = 0; ; from += ANALYTICS_PAGE_SIZE) {
+                    let q = supabase.from(table).select('*').gte('created_at', startStr);
+                    if (endStr) q = q.lte('created_at', endStr);
+                    const { data, error } = await q
+                        .order('created_at', { ascending: true })
+                        .order(primaryKey, { ascending: true })
+                        .range(from, from + ANALYTICS_PAGE_SIZE - 1);
+                    if (error) throw error;
+                    rows.push(...(data || []));
+                    if (!data || data.length < ANALYTICS_PAGE_SIZE) break;
+                }
+                return rows;
             };
 
             const [daily, voice, calendar, pss, wemwbs, ffmq] = await Promise.all([
-                buildQ('daily_sliders'),
-                buildQ('voice_recordings'),
-                buildQ('calendar_events'),
-                buildQ('questionnaire_pss10_responses'),
-                buildQ('questionnaire_wemwbs14_responses'),
-                buildQ('questionnaire_ffmq15_responses'),
+                fetchAll('daily_sliders', 'id'),
+                fetchAll('voice_recordings', 'id'),
+                fetchAll('calendar_events', 'id'),
+                fetchAll('questionnaire_pss10_responses', 'id'),
+                fetchAll('questionnaire_wemwbs14_responses', 'id'),
+                fetchAll('questionnaire_ffmq15_responses', 'id'),
             ]);
 
             const snapshot: AnalyticsSnapshot = {
-                dailySliders: (daily.data || []) as AnalyticsSnapshot['dailySliders'],
-                voiceRecordings: (voice.data || []) as AnalyticsSnapshot['voiceRecordings'],
-                calendarEvents: (calendar.data || []) as AnalyticsSnapshot['calendarEvents'],
-                pss10: (pss.data || []) as AnalyticsSnapshot['pss10'],
-                wemwbs14: (wemwbs.data || []) as AnalyticsSnapshot['wemwbs14'],
-                ffmq15: (ffmq.data || []) as AnalyticsSnapshot['ffmq15'],
+                dailySliders: daily as AnalyticsSnapshot['dailySliders'],
+                voiceRecordings: voice as AnalyticsSnapshot['voiceRecordings'],
+                calendarEvents: calendar as AnalyticsSnapshot['calendarEvents'],
+                pss10: pss as AnalyticsSnapshot['pss10'],
+                wemwbs14: wemwbs as AnalyticsSnapshot['wemwbs14'],
+                ffmq15: ffmq as AnalyticsSnapshot['ffmq15'],
             };
             setAnalyticsData(snapshot);
             analyticsCache.current[cacheKey] = snapshot;
@@ -375,7 +394,7 @@ export default function AdminDashboard() {
                     // instead of String(), which would otherwise emit the literal text
                     // "[object Object]".
                     const raw = typeof val === 'object' ? JSON.stringify(val) : String(val);
-                    const s = raw.replace(/"/g, '""');
+                    const s = neutralizeCsvFormula(raw, typeof val === 'string').replace(/"/g, '""');
                     return s.includes(',') || s.includes('\n') || s.includes('"') ? `"${s}"` : s;
                 }).join(','))
             ].join('\r\n');

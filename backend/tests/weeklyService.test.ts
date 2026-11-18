@@ -64,3 +64,57 @@ describe('WeeklyService.getWeeklyVideo group selection', () => {
         expect(video).toBeNull();
     });
 });
+
+describe('WeeklyService.submitWeeklyEntry file verification', () => {
+    const userId = '11111111-1111-1111-1111-111111111111';
+
+    function load() {
+        jest.resetModules();
+        const supabase = createSupabaseMock({
+            voice_recordings: { data: { id: 1 }, error: null },
+        });
+        jest.doMock('../src/config/supabase', () => ({ supabase }));
+        jest.doMock('../src/config/r2', () => ({
+            r2: { send: jest.fn() },
+            BUCKET_NAME: 'bucket',
+            PUBLIC_URL_BASE: 'https://cdn.example.com',
+        }));
+        const { WeeklyService } = require('../src/services/weeklyService');
+        const { getISOWeekNumber } = require('../src/utils/date');
+        const [year, week] = getISOWeekNumber(new Date());
+        const fileKey = `WeeklyVoice/weekly-${year}-W${String(week).padStart(2, '0')}-${userId}.wav`;
+        return { service: new WeeklyService(), fileKey };
+    }
+
+    it('accepts the URL uploadAudio returned for this key', async () => {
+        const { service, fileKey } = load();
+        await expect(service.submitWeeklyEntry(userId, {
+            file_key: fileKey,
+            file_url: `https://cdn.example.com/${fileKey}`,
+        })).resolves.toEqual({ id: 1 });
+    });
+
+    it.each([
+        'javascript:alert(document.cookie)',
+        'https://phish.example.net/recording.wav',
+        'https://cdn.example.com/WeeklyVoice/other.wav',
+    ])('rejects a file_url that does not match the key: %s', async (fileUrl) => {
+        const { service, fileKey } = load();
+        await expect(service.submitWeeklyEntry(userId, { file_key: fileKey, file_url: fileUrl }))
+            .rejects.toThrow('WEEKLY_FILE_KEY_MISMATCH');
+    });
+});
+
+describe('storedAudioContentType', () => {
+    const { storedAudioContentType } = require('../src/middlewares/uploadMiddleware');
+
+    it.each([
+        ['audio/wav', 'rec.wav', 'audio/wav'],
+        ['audio/webm', 'rec.webm', 'audio/webm'],
+        ['text/html', 'x.wav', 'audio/wav'],
+        ['image/svg+xml', 'x.mp3', 'audio/mpeg'],
+        ['application/octet-stream', 'blob', 'application/octet-stream'],
+    ])('declared %s + %s is stored as %s', (mime, name, expected) => {
+        expect(storedAudioContentType(mime, name)).toBe(expected);
+    });
+});

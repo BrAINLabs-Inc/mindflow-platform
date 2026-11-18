@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/BrAINLabs-Inc/mindflow-platform/backend-v2/internal/auth"
@@ -30,6 +31,13 @@ func RequireAuth(verifier *auth.Verifier) gin.HandlerFunc {
 			return
 		}
 
+		// Every handler parses the subject as the user's UUID; reject a
+		// token whose sub isn't one here (401) rather than letting each
+		// handler fail later with a 500.
+		if _, err := uuid.Parse(claims.Subject); err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+			return
+		}
 		setAuthUser(c, AuthUser{ID: claims.Subject, Email: claims.Email})
 		c.Next()
 	}

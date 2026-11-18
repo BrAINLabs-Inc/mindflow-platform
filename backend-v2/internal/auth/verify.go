@@ -74,7 +74,7 @@ func NewHS256Verifier(secret string) *Verifier {
 // supabase.auth.getUser performs server-side today.
 func (v *Verifier) Verify(tokenString string) (*Claims, error) {
 	claims := &Claims{}
-	token, err := jwt.ParseWithClaims(tokenString, claims, v.keyfunc, jwt.WithValidMethods(v.validMethods))
+	token, err := jwt.ParseWithClaims(tokenString, claims, v.keyfunc, jwt.WithValidMethods(v.validMethods), jwt.WithExpirationRequired())
 	if err != nil {
 		return nil, err
 	}

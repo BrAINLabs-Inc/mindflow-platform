@@ -12,6 +12,7 @@ import { Colors } from '../constants/colors';
 import { cardShadow, cardShadowElevated } from '../styles/shared';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { apiFetch, clearAuthStorage } from '../lib/apiClient';
+import { unregisterPushNotificationsAsync } from '../lib/notifications';
 import { useTabBarHeight } from '../lib/useTabBarHeight';
 
 // Component
@@ -45,6 +46,7 @@ export default function ProfileScreen() {
     // Sign-out
     const handleSignOut = async () => {
         try {
+            await unregisterPushNotificationsAsync();
             await clearAuthStorage();
             navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
         } catch {

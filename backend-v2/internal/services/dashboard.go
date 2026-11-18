@@ -9,6 +9,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/BrAINLabs-Inc/mindflow-platform/backend-v2/internal/db/queries"
 	"github.com/BrAINLabs-Inc/mindflow-platform/backend-v2/internal/researchgroup"
@@ -56,64 +57,54 @@ func (s *DashboardService) GetUserSummary(ctx context.Context, userID pgtype.UUI
 	startOfMonth := time.Date(today.Year(), today.Month(), 1, 0, 0, 0, 0, today.Location())
 	streakSince := today.AddDate(0, 0, -StreakLookbackDays)
 
-	streakData, err := s.q.ListDailyEntriesSince(ctx, queries.ListDailyEntriesSinceParams{
-		UserID:    userID,
-		CreatedAt: pgtype.Timestamptz{Time: streakSince, Valid: true},
+	// The eight reads are independent, so they run concurrently (as
+	// Promise.all does in the TS source); any failure fails the request.
+	var (
+		streakData                             []pgtype.Timestamptz
+		voiceRecordings                        []pgtype.Timestamptz
+		totalCount, recentCount                int64
+		pss10Count, ffmq15Count, wemwbs14Count int64
+		researchID                             pgtype.Text
+	)
+	since := func(t time.Time) pgtype.Timestamptz { return pgtype.Timestamptz{Time: t, Valid: true} }
+	g, gctx := errgroup.WithContext(ctx)
+	g.Go(func() (err error) {
+		streakData, err = s.q.ListDailyEntriesSince(gctx, queries.ListDailyEntriesSinceParams{UserID: userID, CreatedAt: since(streakSince)})
+		return err
 	})
-	if err != nil {
-		return DashboardSummary{}, err
-	}
-
-	totalCount, err := s.q.CountDailyEntriesSince(ctx, queries.CountDailyEntriesSinceParams{
-		UserID:    userID,
-		CreatedAt: pgtype.Timestamptz{Time: sixMonthsAgo, Valid: true},
+	g.Go(func() (err error) {
+		totalCount, err = s.q.CountDailyEntriesSince(gctx, queries.CountDailyEntriesSinceParams{UserID: userID, CreatedAt: since(sixMonthsAgo)})
+		return err
 	})
-	if err != nil {
-		return DashboardSummary{}, err
-	}
-
-	recentCount, err := s.q.CountDailyEntriesSince(ctx, queries.CountDailyEntriesSinceParams{
-		UserID:    userID,
-		CreatedAt: pgtype.Timestamptz{Time: thirtyDaysAgo, Valid: true},
+	g.Go(func() (err error) {
+		recentCount, err = s.q.CountDailyEntriesSince(gctx, queries.CountDailyEntriesSinceParams{UserID: userID, CreatedAt: since(thirtyDaysAgo)})
+		return err
 	})
-	if err != nil {
-		return DashboardSummary{}, err
-	}
-
-	voiceRecordings, err := s.q.ListVoiceRecordingsSince(ctx, queries.ListVoiceRecordingsSinceParams{
-		UserID:    userID,
-		CreatedAt: pgtype.Timestamptz{Time: sixMonthsAgo, Valid: true},
+	g.Go(func() (err error) {
+		voiceRecordings, err = s.q.ListVoiceRecordingsSince(gctx, queries.ListVoiceRecordingsSinceParams{UserID: userID, CreatedAt: since(sixMonthsAgo)})
+		return err
 	})
-	if err != nil {
-		return DashboardSummary{}, err
-	}
-
-	pss10Count, err := s.q.CountStressResponsesSince(ctx, queries.CountStressResponsesSinceParams{
-		UserID:    userID,
-		CreatedAt: pgtype.Timestamptz{Time: startOfMonth, Valid: true},
+	g.Go(func() (err error) {
+		pss10Count, err = s.q.CountStressResponsesSince(gctx, queries.CountStressResponsesSinceParams{UserID: userID, CreatedAt: since(startOfMonth)})
+		return err
 	})
-	if err != nil {
-		return DashboardSummary{}, err
-	}
-
-	ffmq15Count, err := s.q.CountMindfulResponsesSince(ctx, queries.CountMindfulResponsesSinceParams{
-		UserID:    userID,
-		CreatedAt: pgtype.Timestamptz{Time: startOfMonth, Valid: true},
+	g.Go(func() (err error) {
+		ffmq15Count, err = s.q.CountMindfulResponsesSince(gctx, queries.CountMindfulResponsesSinceParams{UserID: userID, CreatedAt: since(startOfMonth)})
+		return err
 	})
-	if err != nil {
-		return DashboardSummary{}, err
-	}
-
-	wemwbs14Count, err := s.q.CountThriveResponsesSince(ctx, queries.CountThriveResponsesSinceParams{
-		UserID:    userID,
-		CreatedAt: pgtype.Timestamptz{Time: startOfMonth, Valid: true},
+	g.Go(func() (err error) {
+		wemwbs14Count, err = s.q.CountThriveResponsesSince(gctx, queries.CountThriveResponsesSinceParams{UserID: userID, CreatedAt: since(startOfMonth)})
+		return err
 	})
-	if err != nil {
-		return DashboardSummary{}, err
-	}
-
-	researchID, err := s.q.GetResearchID(ctx, userID)
-	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+	g.Go(func() error {
+		var err error
+		researchID, err = s.q.GetResearchID(gctx, userID)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil
+		}
+		return err
+	})
+	if err := g.Wait(); err != nil {
 		return DashboardSummary{}, err
 	}
 	var group researchgroup.Group

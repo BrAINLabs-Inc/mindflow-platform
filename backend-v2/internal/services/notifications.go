@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"strings"
+	"sync"
 
 	"github.com/jackc/pgx/v5/pgtype"
 
@@ -15,6 +17,11 @@ import (
 
 // ErrInvalidExpoPushToken is returned when a registered token doesn't
 // match Expo's push token format.
+// reminderLookupConcurrency caps how many users' status lookups run at
+// once during the pending-task job, leaving most of the pool (MaxConns 25)
+// free for live API traffic at 19:00.
+const reminderLookupConcurrency = 4
+
 var ErrInvalidExpoPushToken = errors.New("Invalid Expo push token")
 
 // taskLabels mirrors the labels on the mobile DashboardScreen's roadmap
@@ -115,11 +122,33 @@ func (s *NotificationService) SendPendingTaskReminders(ctx context.Context) (int
 	}
 
 	var messages []notify.Message
-	for _, userID := range order {
-		pending, err := s.getPendingTaskLabels(ctx, userID)
-		if err != nil {
+	// Status lookups (5 queries per user) run with bounded concurrency
+	// instead of one user at a time -- at study scale the sequential
+	// version was ~5×N round trips back to back. Results are collected by
+	// index so message order stays the same as the sequential version.
+	pendingByIdx := make([][]string, len(order))
+	errByIdx := make([]error, len(order))
+	sem := make(chan struct{}, reminderLookupConcurrency)
+	var wg sync.WaitGroup
+	for i, userID := range order {
+		wg.Add(1)
+		sem <- struct{}{}
+		go func() {
+			defer wg.Done()
+			defer func() { <-sem }()
+			pendingByIdx[i], errByIdx[i] = s.getPendingTaskLabels(ctx, userID)
+		}()
+	}
+	wg.Wait()
+
+	for i, userID := range order {
+		// One user's status lookup failing must not skip reminders for
+		// everyone else that night (same as notificationService.ts).
+		if errByIdx[i] != nil {
+			log.Printf("[NotificationService] Failed to get pending tasks for user %s: %v", userID.String(), errByIdx[i])
 			continue
 		}
+		pending := pendingByIdx[i]
 		if len(pending) == 0 {
 			continue
 		}

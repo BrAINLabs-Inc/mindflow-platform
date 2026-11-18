@@ -2,6 +2,7 @@ import { Response } from 'express';
 import { z } from 'zod';
 import { WeeklyService } from '../services/weeklyService';
 import { AuthenticatedRequest } from '../middlewares/authMiddleware';
+import { storedAudioContentType } from '../middlewares/uploadMiddleware';
 
 const weeklyService = new WeeklyService();
 
@@ -54,7 +55,7 @@ export const uploadAudio = async (req: AuthenticatedRequest, res: Response): Pro
             return;
         }
 
-        const result = await weeklyService.uploadAudio(req.user.id, req.file.buffer, req.file.mimetype);
+        const result = await weeklyService.uploadAudio(req.user.id, req.file.buffer, storedAudioContentType(req.file.mimetype, req.file.originalname));
         res.json(result);
     } catch (error: any) {
         console.error('uploadAudio:', error);

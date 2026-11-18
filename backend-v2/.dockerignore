@@ -1,0 +1,4 @@
+.env
+bin/
+loadtest/
+**/*_test.go

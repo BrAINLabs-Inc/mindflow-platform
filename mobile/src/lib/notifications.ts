@@ -45,3 +45,27 @@ export async function registerForPushNotificationsAsync(): Promise<void> {
         console.log('Push notification registration skipped:', error);
     }
 }
+
+// Best-effort removal of this device's push token on sign-out, so a signed-out
+// device stops receiving reminders that greet the previous participant by name.
+// Must run while the session token is still stored (the endpoint requires auth),
+// and never throws — failing to unregister must not block signing out.
+export async function unregisterPushNotificationsAsync(): Promise<void> {
+    try {
+        const { status } = await Notifications.getPermissionsAsync();
+        if (status !== 'granted') return; // never registered
+
+        const projectId = Constants.expoConfig?.extra?.eas?.projectId;
+        const { data: token } = await Notifications.getExpoPushTokenAsync(
+            projectId ? { projectId } : undefined
+        );
+        if (!token) return;
+
+        await apiFetch('/api/notifications/unregister-token', {
+            method: 'POST',
+            body: JSON.stringify({ token }),
+        });
+    } catch (error) {
+        console.log('Push notification unregistration skipped:', error);
+    }
+}

@@ -75,13 +75,53 @@ func TestRequireAuth_InvalidToken(t *testing.T) {
 	}
 }
 
+func signHS256(t *testing.T, claims *auth.Claims) string {
+	t.Helper()
+	s, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte("secret"))
+	if err != nil {
+		t.Fatalf("signing token: %v", err)
+	}
+	return s
+}
+
+func TestRequireAuth_RejectsNonUUIDSubject(t *testing.T) {
+	r := newTestRouter(RequireAuth(auth.NewHS256Verifier("secret")))
+	tok := signHS256(t, &auth.Claims{RegisteredClaims: jwt.RegisteredClaims{
+		Subject:   "not-a-uuid",
+		Audience:  jwt.ClaimStrings{"authenticated"},
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour)),
+	}})
+	req := httptest.NewRequest(http.MethodGet, "/protected", nil)
+	req.Header.Set("Authorization", "Bearer "+tok)
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusUnauthorized {
+		t.Fatalf("status = %d, want 401", w.Code)
+	}
+}
+
+func TestRequireAuth_RejectsTokenWithoutExp(t *testing.T) {
+	r := newTestRouter(RequireAuth(auth.NewHS256Verifier("secret")))
+	tok := signHS256(t, &auth.Claims{RegisteredClaims: jwt.RegisteredClaims{
+		Subject:  "33333333-3333-3333-3333-333333333333",
+		Audience: jwt.ClaimStrings{"authenticated"},
+	}})
+	req := httptest.NewRequest(http.MethodGet, "/protected", nil)
+	req.Header.Set("Authorization", "Bearer "+tok)
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusUnauthorized {
+		t.Fatalf("status = %d, want 401 for a token with no exp claim", w.Code)
+	}
+}
+
 func TestRequireAuth_ValidToken(t *testing.T) {
 	v := auth.NewHS256Verifier("secret")
 	r := newTestRouter(RequireAuth(v))
 
 	claims := &auth.Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
-			Subject:   "user-42",
+			Subject:   "33333333-3333-3333-3333-333333333333",
 			Audience:  jwt.ClaimStrings{"authenticated"},
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour)),
 		},
@@ -100,7 +140,7 @@ func TestRequireAuth_ValidToken(t *testing.T) {
 	if w.Code != http.StatusOK {
 		t.Fatalf("status = %d, want %d, body=%s", w.Code, http.StatusOK, w.Body.String())
 	}
-	if got := w.Body.String(); got != `{"email":"p@example.com","id":"user-42"}` {
+	if got := w.Body.String(); got != `{"email":"p@example.com","id":"33333333-3333-3333-3333-333333333333"}` {
 		t.Errorf("body = %s", got)
 	}
 }

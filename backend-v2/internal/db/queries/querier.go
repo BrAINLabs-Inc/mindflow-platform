@@ -68,17 +68,19 @@ type Querier interface {
 	// call, zero reimplementation risk (see plan §3). Raises
 	// THRIVE_ALREADY_SUBMITTED, caught by the caller via *pgconn.PgError.
 	SubmitThriveEntry(ctx context.Context, arg SubmitThriveEntryParams) (QuestionnaireWemwbs14Response, error)
+	// POST /api/profile/about-me (profileService.ts updateAboutMe). Partial-upsert
+	// semantics, matching PostgREST's upsert of an allowlisted payload: only
+	// fields present in the request body (set_<field> = true) are written --
+	// an explicit null clears the column, an absent field keeps its stored
+	// value on update and gets the column default on insert (NULL for the
+	// text/int fields, FALSE for is_completed). updated_at is always bumped,
+	// as the TS source sets it explicitly on every call.
+	UpsertAboutMe(ctx context.Context, arg UpsertAboutMeParams) (AboutMeProfile, error)
 	// Upsert on (user_id, entry_date) instead of select-then-insert/update --
 	// closes the double-submit race that would otherwise produce duplicate
 	// rows for the same day (see project_db.sql's
 	// daily_sliders_user_entry_date_unique constraint).
 	UpsertDailyEntry(ctx context.Context, arg UpsertDailyEntryParams) (DailySlider, error)
-	// POST /api/profile/about-me (updateAboutMe) is a write endpoint, out of
-	// scope for the read-only phase-2 pass -- see plan §2. Its partial-upsert
-	// semantics (only fields present in the request body get overwritten,
-	// everything else keeps its previous value) don't map onto a single
-	// fixed-column sqlc query anyway; it needs a dynamically built UPDATE SET
-	// clause, ported when the write endpoints land.
 	// Signup's initial username assignment. Only touches username -- never
 	// research_id (that's researcher-assigned only, never set at signup --
 	// see CLAUDE.md's research-group note). A collision with another user's

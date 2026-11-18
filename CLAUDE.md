@@ -7,12 +7,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 MindFlow is a longitudinal mindfulness research platform. Study participants use the mobile app; researchers use the web admin portal. Four independent npm projects share one Postgres/Supabase database (schema in `database/project_db.sql` — there is no ORM or migration tool, this file is the single source of truth for the schema):
 
 - `mobile/` — Expo (React Native) client for study participants.
-- `backend/` — Express/TypeScript API, the only thing that talks to Supabase with the service-role key.
+- `backend/` — Express/TypeScript API, the only thing that talks to Supabase with the service-role key. Still the production API.
+- `backend-v2/` — Go (Gin + pgx/sqlc) rewrite of `backend/`, being migrated per `plans/backend-go-migration.md`. Must stay a drop-in replacement (same routes, status codes, error bodies); `backend/` is deleted and `backend-v2/` renamed to `api/` only after production cutover (checklist in `FINDINGS_AND_DEVELOPMENT.md` §11; the root Makefile's `API_DIR` is the only build reference to update). From the repo root: `make test-api` (needs Docker), `make sqlc` after editing `internal/db/sql/*.sql`, `make seed` (port of the Express seed). `.env` is loaded automatically, like dotenv.
 - `web-admin/` — React + Vite + Tailwind portal for researchers/admins.
 - `web-app/` — React + Vite web counterpart of the participant experience (Daily Sliders, Weekly Whispers, questionnaires, calendar).
 - `docs/` — architecture, database, and research-methodology guides; read these for deeper context before changing schema or clinical-scale logic.
 
-Each subproject has its own `package.json`, `node_modules`, and `.env`/`.env.example` — there is no root-level workspace tooling.
+Each subproject has its own `package.json` (or `go.mod`), dependencies, and `.env`/`.env.example` — there is no workspace tooling. A root `Makefile` orchestrates all of them (`make help`; `make install`, `make dev`, `make check` mirrors CI).
 
 ## Commands
 
@@ -31,14 +32,14 @@ Run these from inside the relevant subdirectory (`backend/`, `mobile/`, `web-adm
 - `npm start` / `npm run android` / `npm run ios` / `npm run web` — Expo dev server.
 - `npx tsc --noEmit` — type check (no separate build step; this is what CI runs).
 - `npm test` — Jest via the `jest-expo` preset; single file: `npx jest src/screens/__tests__/JourneyScreen.test.tsx`.
-- `npm run lint` — ESLint (non-blocking in CI; pre-existing warnings/1 error not yet cleaned up).
+- `npm run lint` — ESLint (non-blocking in CI; 0 errors, only pre-existing `exhaustive-deps` warnings on Reanimated shared values remain).
 
 **web-admin/** and **web-app/**
 - `npm run dev` — Vite dev server (web-app defaults to port 5174 to coexist with web-admin's 5173).
 - `npm run build` — `tsc -b && vite build`.
 - `npm run lint` — ESLint.
 
-CI (`.github/workflows/ci.yml`) runs four separate jobs on push/PR to `main`/`development`: `backend` (lint + build + test, lint blocking), `web-admin` and `web-app` (lint + build, lint non-blocking), `mobile` (lint + typecheck + test, lint non-blocking). Separate workflows (`codeql.yml`, `ios-build.yml`, `build-android.yml`, `mobile-build.yml`) handle CodeQL scanning and native/EAS mobile builds.
+CI (`.github/workflows/ci.yml`) runs five separate jobs on push/PR to `main`/`development`: `backend` (lint + build + test, lint blocking), `backend-v2` (gofmt + vet + sqlc drift check + build + test, all blocking), `web-admin` (lint + build, lint blocking), `web-app` (lint + build, lint non-blocking), `mobile` (lint + typecheck + test, lint non-blocking). Separate workflows (`codeql.yml`, `ios-build.yml`, `build-android.yml`, `mobile-build.yml`) handle CodeQL scanning and native/EAS mobile builds.
 
 ## Architecture notes that span multiple files
 
@@ -52,6 +53,8 @@ CI (`.github/workflows/ci.yml`) runs four separate jobs on push/PR to `main`/`de
 
 **Backend env vars use its own names, not Expo's.** Backend reads `SUPABASE_URL` / `SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY` (`backend/src/config/supabase.ts`). Mobile reads `EXPO_PUBLIC_*`-prefixed vars by Expo convention. Don't copy mobile's `.env` naming into `backend/.env` — they are deliberately different and the backend config no longer falls back to the `EXPO_PUBLIC_*` names.
 
-**RLS is on for every table; admin bypass is a separate `admins` table.** Every table in `project_db.sql` has `"Users see own, Admins see all"` policies that check `EXISTS (SELECT 1 FROM admins WHERE id = auth.uid())`. The backend itself connects with the Supabase **service role key** (bypasses RLS entirely) — RLS is the safety net for any direct client access (web-admin, future direct-to-Supabase calls), not something the Express layer relies on.
+**Schema changes to an existing database go in `database/patches/`.** `project_db.sql` is the bootstrap source of truth; a change also needs an idempotent patch file for already-deployed databases (see `patches/2026-11-18-security-hardening.sql`).
 
-**Tests mock the Supabase client at the module boundary, not the network.** Both `backend/tests/helpers/supabaseMock.ts` and mobile's per-test `jest.mock('../../lib/apiClient', ...)` replace `supabase`/`apiFetch` entirely rather than hitting a real or local database — there is no test database. When adding backend tests, mock `../src/config/supabase` before importing the controller/service under test, since the real module throws at import time if `SUPABASE_URL` isn't set.
+**RLS is on for every table; admin bypass is a separate `admins` table.** Participant policies on research-data tables are read-only (all participant writes go through the backend), and a trigger (`guard_profiles_research_id`) stops anyone but an admin from changing `profiles.research_id` under a user JWT. Every table in `project_db.sql` has `"Users see own, Admins see all"` policies that check `EXISTS (SELECT 1 FROM admins WHERE id = auth.uid())`. The backend itself connects with the Supabase **service role key** (bypasses RLS entirely) — RLS is the safety net for any direct client access (web-admin, future direct-to-Supabase calls), not something the Express layer relies on.
+
+**Tests mock the Supabase client at the module boundary, not the network.** Both `backend/tests/helpers/supabaseMock.ts` and mobile's per-test `jest.mock('../../lib/apiClient', ...)` replace `supabase`/`apiFetch` entirely rather than hitting a real or local database — there is no test database for the Node projects. (`backend-v2/` is the exception: its integration tests run against a throwaway Postgres via testcontainers with `project_db.sql` applied, including RLS/trigger tests that act as a participant JWT.) When adding backend tests, mock `../src/config/supabase` before importing the controller/service under test, since the real module throws at import time if `SUPABASE_URL` isn't set.

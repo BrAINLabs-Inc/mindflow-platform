@@ -30,11 +30,32 @@ BEGIN
 END
 $$;
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON
+-- Grants are scoped to exactly what backend-v2's queries
+-- (internal/db/sql/*.sql) and RPCs need -- re-running this file narrows a
+-- role created from an older, broader version of it (REVOKE first).
+REVOKE ALL ON
     profiles, about_me_profiles, daily_sliders, voice_recordings, weekly_recordings,
     questionnaire_pss10_responses, questionnaire_ffmq15_responses, questionnaire_wemwbs14_responses,
-    calendar_events, push_tokens
+    calendar_events, push_tokens, admins
+    FROM app_backend_v2;
+-- Granted by earlier versions of this file; the API never inserts events.
+REVOKE ALL ON SEQUENCE calendar_events_id_seq FROM app_backend_v2;
+
+-- Participant data written via upserts (INSERT ... ON CONFLICT DO UPDATE).
+GRANT SELECT, INSERT, UPDATE ON
+    profiles, about_me_profiles, daily_sliders, voice_recordings
     TO app_backend_v2;
+
+-- Rolling-window questionnaires are insert-only (via the submit_* RPCs).
+GRANT SELECT, INSERT ON
+    questionnaire_pss10_responses, questionnaire_ffmq15_responses, questionnaire_wemwbs14_responses
+    TO app_backend_v2;
+
+-- Push tokens are the only table the API ever deletes from (unregister).
+GRANT SELECT, INSERT, UPDATE, DELETE ON push_tokens TO app_backend_v2;
+
+-- Researcher-managed content: read-only for the API.
+GRANT SELECT ON weekly_recordings, calendar_events TO app_backend_v2;
 
 GRANT SELECT ON admins TO app_backend_v2;  -- needed for requireAdmin parity
 
@@ -42,19 +63,17 @@ GRANT EXECUTE ON FUNCTION
     submit_stress_entry, submit_thrive_entry, submit_mindful_entry, increment_daily_video_seconds
     TO app_backend_v2;
 
--- Sequence grants for the SERIAL primary keys on the tables above --
--- without USAGE, an INSERT under this role fails to advance nextval()
--- even though the table-level INSERT grant above succeeds. Not present
--- in the plan's original snippet; added here since the write grants
--- above are non-functional without it (profiles/about_me_profiles use a
--- UUID PK tied to auth.users, so they have no sequence to grant).
+-- Sequence grants for the SERIAL primary keys of the tables this role
+-- inserts into -- without USAGE, an INSERT under this role fails to
+-- advance nextval() even though the table-level INSERT grant succeeds.
+-- (profiles/about_me_profiles use a UUID PK tied to auth.users, so they
+-- have no sequence to grant.)
 GRANT USAGE, SELECT ON SEQUENCE
     daily_sliders_id_seq,
     voice_recordings_id_seq,
     questionnaire_pss10_responses_id_seq,
     questionnaire_ffmq15_responses_id_seq,
     questionnaire_wemwbs14_responses_id_seq,
-    calendar_events_id_seq,
     push_tokens_id_seq
     TO app_backend_v2;
 

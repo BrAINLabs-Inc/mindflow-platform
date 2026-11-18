@@ -37,6 +37,31 @@ jobs:
       - run: npm run build
       - run: npm test
 
+  # Go rewrite of backend/ (see plans/backend-go-migration.md). Needs no
+  # secrets: integration tests run against a disposable Postgres via
+  # testcontainers (Docker ships on ubuntu-latest), and Supabase Auth / R2 /
+  # Expo push are stood in for by httptest servers.
+  backend-v2:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend-v2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend-v2/go.mod
+          cache-dependency-path: backend-v2/go.sum
+      - name: gofmt
+        run: test -z "$(gofmt -l .)" || (gofmt -l . && exit 1)
+      - run: go vet ./...
+      - name: sqlc generated code is up to date
+        run: |
+          go install github.com/sqlc-dev/sqlc/cmd/sqlc@v1.31.1
+          cd internal/db && "$(go env GOPATH)/bin/sqlc" diff -f sqlc.yaml
+      - run: go build ./...
+      - run: go test ./...
+
   web-admin:
     runs-on: ubuntu-latest
     defaults:
@@ -50,9 +75,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: web-admin/package-lock.json
       - run: npm ci
-      # eslint.config.js currently throws on this project (pre-existing, unrelated to CI) — non-blocking until fixed.
       - run: npm run lint
-        continue-on-error: true
       - run: npm run build
 
   web-app:

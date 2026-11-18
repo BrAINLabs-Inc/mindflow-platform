@@ -349,6 +349,7 @@ const RoadmapNode = memo(({
         </TouchableOpacity>
     );
 });
+RoadmapNode.displayName = 'RoadmapNode';
 
 export default function DashboardScreen() {
     const navigation = useNavigation<DashboardNavProp>();

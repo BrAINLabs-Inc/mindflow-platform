@@ -78,6 +78,12 @@ func (s *ProfileService) GetAboutMe(ctx context.Context, userID pgtype.UUID) (Ab
 		return AboutMe{}, err
 	}
 
+	return aboutMeFromRow(row), nil
+}
+
+// aboutMeFromRow converts an about_me_profiles row into the response DTO
+// shared by GET and POST /api/profile/about-me.
+func aboutMeFromRow(row queries.AboutMeProfile) AboutMe {
 	about := AboutMe{
 		ID:                 row.ID.String(),
 		UniversityID:       db.TextPtr(row.UniversityID),
@@ -103,5 +109,57 @@ func (s *ProfileService) GetAboutMe(ctx context.Context, userID pgtype.UUID) (Ab
 		s := row.UpdatedAt.Time.Format("2006-01-02T15:04:05.999999Z07:00")
 		about.UpdatedAt = &s
 	}
-	return about, nil
+	return about
+}
+
+// Field is one optional field of a partial update: Set reports whether the
+// key was present in the request body at all, Value is nil for an explicit
+// JSON null. Mirrors profileService.ts's `body[field] !== undefined` check.
+type Field[T any] struct {
+	Set   bool
+	Value *T
+}
+
+// AboutMeUpdate is the validated, allowlisted body of
+// POST /api/profile/about-me (ABOUT_ME_FIELDS in profileService.ts).
+type AboutMeUpdate struct {
+	UniversityID       Field[string]
+	EducationLevel     Field[string]
+	Faculty            Field[string]
+	MajorFieldOfStudy  Field[string]
+	Age                Field[int32]
+	LivingSituation    Field[string]
+	FamilyBackground   Field[string]
+	CulturalBackground Field[string]
+	HobbiesInterests   Field[string]
+	PersonalGoals      Field[string]
+	WhyMindflow        Field[string]
+	IsCompleted        Field[bool]
+}
+
+// UpdateAboutMe is a port of profileService.ts's updateAboutMe: a partial
+// upsert of only the fields present in the request, returning the full
+// resulting row.
+func (s *ProfileService) UpdateAboutMe(ctx context.Context, userID pgtype.UUID, u AboutMeUpdate) (AboutMe, error) {
+	text := func(f Field[string]) (bool, pgtype.Text) { return f.Set, db.OptionalText(f.Value) }
+	p := queries.UpsertAboutMeParams{ID: userID}
+	p.SetUniversityID, p.UniversityID = text(u.UniversityID)
+	p.SetEducationLevel, p.EducationLevel = text(u.EducationLevel)
+	p.SetFaculty, p.Faculty = text(u.Faculty)
+	p.SetMajorFieldOfStudy, p.MajorFieldOfStudy = text(u.MajorFieldOfStudy)
+	p.SetAge, p.Age = u.Age.Set, db.OptionalInt4(u.Age.Value)
+	p.SetLivingSituation, p.LivingSituation = text(u.LivingSituation)
+	p.SetFamilyBackground, p.FamilyBackground = text(u.FamilyBackground)
+	p.SetCulturalBackground, p.CulturalBackground = text(u.CulturalBackground)
+	p.SetHobbiesInterests, p.HobbiesInterests = text(u.HobbiesInterests)
+	p.SetPersonalGoals, p.PersonalGoals = text(u.PersonalGoals)
+	p.SetWhyMindflow, p.WhyMindflow = text(u.WhyMindflow)
+	if u.IsCompleted.Set && u.IsCompleted.Value != nil {
+		p.SetIsCompleted, p.IsCompleted = true, *u.IsCompleted.Value
+	}
+	row, err := s.q.UpsertAboutMe(ctx, p)
+	if err != nil {
+		return AboutMe{}, err
+	}
+	return aboutMeFromRow(row), nil
 }

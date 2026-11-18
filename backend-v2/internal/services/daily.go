@@ -130,14 +130,14 @@ func (s *DailyService) SubmitDailyEntry(ctx context.Context, userID pgtype.UUID,
 		CalmBefore:     pgtype.Int4{Int32: in.CalmBefore, Valid: true},
 		CalmAfter:      pgtype.Int4{Int32: in.CalmAfter, Valid: true},
 		SleepQuality:   pgtype.Int4{Int32: in.SleepQuality, Valid: true},
-		SleepStartTime: db.OptionalText(in.SleepStartTime),
-		WakeUpTime:     db.OptionalText(in.WakeUpTime),
-		Feelings:       db.OptionalText(in.Feelings),
+		SleepStartTime: db.OptionalText(nonEmpty(in.SleepStartTime)),
+		WakeUpTime:     db.OptionalText(nonEmpty(in.WakeUpTime)),
+		Feelings:       db.OptionalText(nonEmpty(in.Feelings)),
 	}
 	if !isControlGroup {
-		params.MindfulnessPractice = db.OptionalText(in.MindfulnessPractice)
-		params.PracticeDuration = db.OptionalInt4(in.PracticeDuration)
-		params.PracticeLocation = db.OptionalText(in.PracticeLocation)
+		params.MindfulnessPractice = db.OptionalText(nonEmpty(in.MindfulnessPractice))
+		params.PracticeDuration = db.OptionalInt4(nonZero(in.PracticeDuration))
+		params.PracticeLocation = db.OptionalText(nonEmpty(in.PracticeLocation))
 	}
 
 	return s.q.UpsertDailyEntry(ctx, params)
@@ -157,4 +157,22 @@ func (s *DailyService) UpdateVideoProgress(ctx context.Context, userID pgtype.UU
 		return row.VideoPlaySeconds.Int32, nil
 	}
 	return 0, nil
+}
+
+// nonEmpty and nonZero reproduce dailyService.ts's `value || null`
+// normalisation: JS treats "" and 0 as falsy, so Express stores NULL for
+// them rather than the literal empty string / zero. (web-app sends
+// feelings: ” when no influencing factor is picked.)
+func nonEmpty(s *string) *string {
+	if s == nil || *s == "" {
+		return nil
+	}
+	return s
+}
+
+func nonZero(v *int32) *int32 {
+	if v == nil || *v == 0 {
+		return nil
+	}
+	return v
 }

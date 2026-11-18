@@ -163,11 +163,13 @@ CREATE POLICY "Users see own, Admins see all"
         EXISTS (SELECT 1 FROM admins WHERE id = auth.uid())
     );
 
+DROP POLICY IF EXISTS "Users can update own profile" ON profiles;
 CREATE POLICY "Users can update own profile"
     ON profiles
     FOR UPDATE
     USING (id = auth.uid());
 
+DROP POLICY IF EXISTS "Users can insert own profile" ON profiles;
 CREATE POLICY "Users can insert own profile"
     ON profiles
     FOR INSERT
@@ -178,6 +180,34 @@ CREATE POLICY "Admins manage all profiles"
     ON profiles FOR ALL
     USING (EXISTS (SELECT 1 FROM admins WHERE id = auth.uid()))
     WITH CHECK (EXISTS (SELECT 1 FROM admins WHERE id = auth.uid()));
+
+-- Trigger: research_id (the participant's study arm) may only be set or changed
+-- by an admin. RLS can't restrict individual columns, and the UPDATE/INSERT
+-- policies above would otherwise let a participant holding the public anon key
+-- rewrite their own research_id via PostgREST (e.g. .cg -> .ex). auth.uid() is
+-- NULL for the service role, backend-v2's Postgres role and Supabase Auth's
+-- signup trigger, so backend, seed and admin-portal writes are unaffected.
+CREATE OR REPLACE FUNCTION public.guard_profiles_research_id()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF auth.uid() IS NOT NULL
+       AND (
+            (TG_OP = 'INSERT' AND NEW.research_id IS NOT NULL)
+         OR (TG_OP = 'UPDATE' AND NEW.research_id IS DISTINCT FROM OLD.research_id)
+       )
+       AND NOT EXISTS (SELECT 1 FROM public.admins WHERE id = auth.uid())
+    THEN
+        RAISE EXCEPTION 'research_id can only be assigned by a researcher'
+            USING ERRCODE = '42501';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, auth;
+
+DROP TRIGGER IF EXISTS guard_profiles_research_id ON profiles;
+CREATE TRIGGER guard_profiles_research_id
+    BEFORE INSERT OR UPDATE ON profiles
+    FOR EACH ROW EXECUTE FUNCTION public.guard_profiles_research_id();
 
 -- ------------------------------------------------------------------------------
 -- Table: about_me_profiles
@@ -227,14 +257,22 @@ ALTER TABLE about_me_profiles ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Users can only access their own about me profile" ON about_me_profiles;
 DROP POLICY IF EXISTS "Users see own, Admins see all" ON about_me_profiles;
 
+-- Participants read only: onboarding writes go through the backend
+-- (POST /api/profile/about-me), which validates required fields.
 CREATE POLICY "Users see own, Admins see all"
     ON about_me_profiles
-    FOR ALL
+    FOR SELECT
     USING (
         id = auth.uid()
         OR
         EXISTS (SELECT 1 FROM admins WHERE id = auth.uid())
     );
+
+DROP POLICY IF EXISTS "Admins manage all about me profiles" ON about_me_profiles;
+CREATE POLICY "Admins manage all about me profiles"
+    ON about_me_profiles FOR ALL
+    USING (EXISTS (SELECT 1 FROM admins WHERE id = auth.uid()))
+    WITH CHECK (EXISTS (SELECT 1 FROM admins WHERE id = auth.uid()));
 
 -- ==============================================================================
 -- 3. CORE FEATURES (Mindfulness & Tracking)
@@ -287,15 +325,11 @@ CREATE POLICY "Users see own, Admins see all"
         EXISTS (SELECT 1 FROM admins WHERE id = auth.uid())
     );
 
-CREATE POLICY "Users can insert own daily sliders"
-    ON daily_sliders
-    FOR INSERT
-    WITH CHECK (user_id = auth.uid());
-
-CREATE POLICY "Users can update own daily sliders"
-    ON daily_sliders
-    FOR UPDATE
-    USING (user_id = auth.uid());
+-- No participant INSERT/UPDATE policies: every participant write goes through
+-- the backend, which enforces the cg once-a-day lockout and field-nulling rule
+-- (direct writes would bypass both).
+DROP POLICY IF EXISTS "Users can insert own daily sliders" ON daily_sliders;
+DROP POLICY IF EXISTS "Users can update own daily sliders" ON daily_sliders;
 
 DROP POLICY IF EXISTS "Admins manage all daily sliders" ON daily_sliders;
 CREATE POLICY "Admins manage all daily sliders"
@@ -306,6 +340,9 @@ CREATE POLICY "Admins manage all daily sliders"
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_daily_sliders_user_id ON daily_sliders(user_id);
 CREATE INDEX IF NOT EXISTS idx_daily_sliders_created_at ON daily_sliders(created_at);
+-- Matches every status/streak/journey query: WHERE user_id = $1 AND created_at >= $2
+-- ORDER BY created_at DESC [LIMIT n].
+CREATE INDEX IF NOT EXISTS idx_daily_sliders_user_created ON daily_sliders(user_id, created_at DESC);
 
 -- Function: increment_daily_video_seconds
 -- Purpose: Atomically inserts-or-increments today's video_play_seconds in a single
@@ -361,15 +398,10 @@ CREATE POLICY "Users see own, Admins see all"
         EXISTS (SELECT 1 FROM admins WHERE id = auth.uid())
     );
 
-CREATE POLICY "Users can insert own recordings"
-    ON voice_recordings
-    FOR INSERT
-    WITH CHECK (user_id = auth.uid());
-
-CREATE POLICY "Users can update own recordings"
-    ON voice_recordings
-    FOR UPDATE
-    USING (user_id = auth.uid());
+-- No participant INSERT/UPDATE policies: submissions go through the backend,
+-- which verifies the file_key/file_url belong to this user's upload this week.
+DROP POLICY IF EXISTS "Users can insert own recordings" ON voice_recordings;
+DROP POLICY IF EXISTS "Users can update own recordings" ON voice_recordings;
 
 DROP POLICY IF EXISTS "Admins manage all voice recordings" ON voice_recordings;
 CREATE POLICY "Admins manage all voice recordings"
@@ -380,6 +412,7 @@ CREATE POLICY "Admins manage all voice recordings"
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_voice_recordings_user_id ON voice_recordings(user_id);
 CREATE INDEX IF NOT EXISTS idx_voice_recordings_week_year ON voice_recordings(week_number, year);
+CREATE INDEX IF NOT EXISTS idx_voice_recordings_user_created ON voice_recordings(user_id, created_at DESC);
 
 -- ------------------------------------------------------------------------------
 -- Table: weekly_recordings
@@ -437,10 +470,13 @@ CREATE TABLE IF NOT EXISTS questionnaire_pss10_responses (
 -- RLS: PSS-10
 ALTER TABLE questionnaire_pss10_responses ENABLE ROW LEVEL SECURITY;
 
+-- Participants read only: submissions go through the backend's
+-- advisory-lock-guarded RPC, which a direct INSERT would bypass.
 DROP POLICY IF EXISTS "Users manage own PSS10 responses" ON questionnaire_pss10_responses;
-CREATE POLICY "Users manage own PSS10 responses"
+DROP POLICY IF EXISTS "Users view own PSS10 responses" ON questionnaire_pss10_responses;
+CREATE POLICY "Users view own PSS10 responses"
     ON questionnaire_pss10_responses
-    FOR ALL USING (user_id = auth.uid());
+    FOR SELECT USING (user_id = auth.uid());
 
 DROP POLICY IF EXISTS "Admins view all PSS10 responses" ON questionnaire_pss10_responses;
 CREATE POLICY "Admins view all PSS10 responses"
@@ -456,6 +492,7 @@ CREATE POLICY "Admins manage PSS10"
 
 -- Index
 CREATE INDEX IF NOT EXISTS idx_pss10_user_id ON questionnaire_pss10_responses(user_id);
+CREATE INDEX IF NOT EXISTS idx_pss10_user_created ON questionnaire_pss10_responses(user_id, created_at DESC);
 
 -- Function: submit_stress_entry
 -- Purpose: Atomically enforces the 30-day PSS-10 lockout and inserts the response in one
@@ -528,10 +565,13 @@ CREATE TABLE IF NOT EXISTS questionnaire_ffmq15_responses (
 -- RLS: FFMQ-15
 ALTER TABLE questionnaire_ffmq15_responses ENABLE ROW LEVEL SECURITY;
 
+-- Participants read only: submissions go through the backend's
+-- advisory-lock-guarded RPC, which a direct INSERT would bypass.
 DROP POLICY IF EXISTS "Users manage own FFMQ15 responses" ON questionnaire_ffmq15_responses;
-CREATE POLICY "Users manage own FFMQ15 responses"
+DROP POLICY IF EXISTS "Users view own FFMQ15 responses" ON questionnaire_ffmq15_responses;
+CREATE POLICY "Users view own FFMQ15 responses"
     ON questionnaire_ffmq15_responses
-    FOR ALL USING (user_id = auth.uid());
+    FOR SELECT USING (user_id = auth.uid());
 
 DROP POLICY IF EXISTS "Admins view all FFMQ15 responses" ON questionnaire_ffmq15_responses;
 CREATE POLICY "Admins view all FFMQ15 responses"
@@ -547,6 +587,7 @@ CREATE POLICY "Admins manage FFMQ15"
 
 -- Index
 CREATE INDEX IF NOT EXISTS idx_ffmq15_user_id ON questionnaire_ffmq15_responses(user_id);
+CREATE INDEX IF NOT EXISTS idx_ffmq15_user_created ON questionnaire_ffmq15_responses(user_id, created_at DESC);
 
 -- Function: submit_mindful_entry
 -- Purpose: Atomically enforces the 30-day FFMQ-15 lockout and inserts the response (with
@@ -621,10 +662,13 @@ CREATE TABLE IF NOT EXISTS questionnaire_wemwbs14_responses (
 -- RLS: WEMWBS-14
 ALTER TABLE questionnaire_wemwbs14_responses ENABLE ROW LEVEL SECURITY;
 
+-- Participants read only: submissions go through the backend's
+-- advisory-lock-guarded RPC, which a direct INSERT would bypass.
 DROP POLICY IF EXISTS "Users manage own WEMWBS14 responses" ON questionnaire_wemwbs14_responses;
-CREATE POLICY "Users manage own WEMWBS14 responses"
+DROP POLICY IF EXISTS "Users view own WEMWBS14 responses" ON questionnaire_wemwbs14_responses;
+CREATE POLICY "Users view own WEMWBS14 responses"
     ON questionnaire_wemwbs14_responses
-    FOR ALL USING (user_id = auth.uid());
+    FOR SELECT USING (user_id = auth.uid());
 
 DROP POLICY IF EXISTS "Admins view all WEMWBS14 responses" ON questionnaire_wemwbs14_responses;
 CREATE POLICY "Admins view all WEMWBS14 responses"
@@ -640,6 +684,7 @@ CREATE POLICY "Admins manage WEMWBS14"
 
 -- Index
 CREATE INDEX IF NOT EXISTS idx_wemwbs14_user_id ON questionnaire_wemwbs14_responses(user_id);
+CREATE INDEX IF NOT EXISTS idx_wemwbs14_user_created ON questionnaire_wemwbs14_responses(user_id, created_at DESC);
 
 -- Function: submit_thrive_entry
 -- Purpose: Atomically enforces the 14-day WEMWBS-14 lockout and inserts the response in

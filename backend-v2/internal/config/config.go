@@ -4,10 +4,14 @@
 package config
 
 import (
+	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -43,6 +47,14 @@ var defaultCORSOrigins = []string{
 // required value is missing, mirroring backend/src/config/supabase.ts's
 // startup check.
 func Load() (*Config, error) {
+	// Like backend/'s dotenv.config(): read ./.env if present, never
+	// overriding variables already set in the real environment (so
+	// production secrets injected by the host always win). A missing file
+	// is fine -- production normally has no .env at all.
+	if err := godotenv.Load(); err != nil && !errors.Is(err, fs.ErrNotExist) {
+		return nil, fmt.Errorf("reading .env: %w", err)
+	}
+
 	cfg := &Config{
 		Port:                   getEnv("PORT", "3000"),
 		NodeEnv:                getEnv("NODE_ENV", "development"),
@@ -56,7 +68,10 @@ func Load() (*Config, error) {
 		R2AccessKeyID:          os.Getenv("R2_ACCESS_KEY_ID"),
 		R2SecretKey:            os.Getenv("R2_SECRET_ACCESS_KEY"),
 		R2BucketName:           os.Getenv("R2_BUCKET_NAME"),
-		R2PublicURLBase:        os.Getenv("R2_PUBLIC_URL"),
+		// PUBLIC_URL_BASE is r2.ts's documented fallback name. (Its other
+		// VITE_/EXPO_PUBLIC_ fallbacks are deliberately not ported -- see
+		// CLAUDE.md's backend env var note.)
+		R2PublicURLBase: firstNonEmpty(os.Getenv("R2_PUBLIC_URL"), os.Getenv("PUBLIC_URL_BASE")),
 	}
 
 	if cfg.JWTVerificationMode != "jwks" && cfg.JWTVerificationMode != "hs256" {
@@ -96,4 +111,13 @@ func getEnv(key, fallback string) string {
 		return v
 	}
 	return fallback
+}
+
+func firstNonEmpty(vals ...string) string {
+	for _, v := range vals {
+		if v != "" {
+			return v
+		}
+	}
+	return ""
 }

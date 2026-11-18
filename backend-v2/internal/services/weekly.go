@@ -130,6 +130,14 @@ func (s *WeeklyService) SubmitWeeklyEntry(ctx context.Context, userID pgtype.UUI
 	if !strings.HasPrefix(fileKey, expectedPrefix) {
 		return queries.VoiceRecording{}, ErrWeeklyFileKeyMismatch
 	}
+	// file_url must be the URL the upload endpoint returned for this key.
+	// Without this check only the key was verified, and a participant
+	// could store any URL (javascript:, a phishing link, ...) that
+	// researchers later open from the admin portal or a data export.
+	// The legitimate client flow echoes /upload's fileUrl back unchanged.
+	if fileURL != s.r2.PublicURL(fileKey) {
+		return queries.VoiceRecording{}, ErrWeeklyFileKeyMismatch
+	}
 
 	return s.q.UpsertVoiceRecording(ctx, queries.UpsertVoiceRecordingParams{
 		UserID:     userID,

@@ -73,7 +73,11 @@ export class WeeklyService {
 
         // file_key must be the key uploadAudio generated for this user/week, or a participant could POST an arbitrary URL to mark the week "completed" without recording anything.
         const expectedKeyPrefix = `WeeklyVoice/weekly-${year}-W${week.toString().padStart(2, '0')}-${userId}`;
-        if (!recordingData.file_key.startsWith(expectedKeyPrefix)) {
+        // file_url must also be the public URL uploadAudio returned for that key — otherwise a
+        // participant could store any URL (javascript:, a phishing link) that researchers later
+        // open from the admin portal or an export. The client flow echoes fileUrl back unchanged.
+        if (!recordingData.file_key.startsWith(expectedKeyPrefix)
+            || recordingData.file_url !== `${PUBLIC_URL_BASE}/${recordingData.file_key}`) {
             const err = new Error('WEEKLY_FILE_KEY_MISMATCH') as any;
             err.status = 400;
             throw err;

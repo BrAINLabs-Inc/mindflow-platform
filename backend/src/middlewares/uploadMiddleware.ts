@@ -11,6 +11,24 @@ const ALLOWED_AUDIO_MIMES = new Set([
     'application/octet-stream',
 ]);
 
+const AUDIO_MIME_BY_EXT: Record<string, string> = {
+    '.wav': 'audio/wav',
+    '.mp3': 'audio/mpeg',
+    '.m4a': 'audio/mp4',
+    '.webm': 'audio/webm',
+    '.ogg': 'audio/ogg',
+};
+
+// The fileFilter below accepts a file if EITHER its declared mimetype OR its extension is
+// allowlisted, so the declared mimetype alone can't be trusted as the stored Content-Type:
+// "x.wav" declared as text/html would otherwise be served from the public R2 bucket as HTML.
+export function storedAudioContentType(mimetype: string | undefined, originalname: string | undefined): string {
+    const mime = (mimetype || '').toLowerCase();
+    if (ALLOWED_AUDIO_MIMES.has(mime)) return mime;
+    const ext = (originalname || '').toLowerCase().match(/\.(wav|mp3|m4a|webm|ogg)$/)?.[0];
+    return (ext && AUDIO_MIME_BY_EXT[ext]) || 'application/octet-stream';
+}
+
 const storage = multer.memoryStorage();
 
 export const upload = multer({
