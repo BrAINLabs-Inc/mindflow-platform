@@ -26,7 +26,7 @@ PATCH             ?= database/patches/2026-11-18-security-hardening.sql
 HAS_LEGACY := $(wildcard $(LEGACY_DIR)/package.json)
 
 .DEFAULT_GOAL := help
-.PHONY: help install dev dev-api dev-admin dev-web dev-mobile \
+.PHONY: help install dev dev-api dev-admin dev-web dev-mobile dev-mobile-preview \
         build build-api build-admin build-web \
         lint lint-api lint-admin lint-web lint-mobile typecheck \
         test test-api test-api-short test-mobile test-legacy \
@@ -64,6 +64,10 @@ dev-web: ## Run the participant web app
 
 dev-mobile: ## Start the Expo dev server
 	cd $(MOBILE_DIR) && npm start
+
+DEV_GROUP ?= ex
+dev-mobile-preview: ## Mobile app in the browser, login bypassed + mock data (DEV ONLY). DEV_GROUP=ex|cg|unassigned
+	cd $(MOBILE_DIR) && EXPO_PUBLIC_DEV_AUTH_BYPASS=true EXPO_PUBLIC_DEV_GROUP=$(DEV_GROUP) npx expo start --web --clear
 
 # ── Build ────────────────────────────────────────────────────────────────────
 

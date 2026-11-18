@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
 import { API_URL } from '../config/api';
+import { DEV_AUTH_BYPASS, DEV_BYPASS_TOKEN } from '../dev/devBypass';
 
 const AUTH_TOKEN_KEY = 'authToken';
 const REFRESH_TOKEN_KEY = 'refreshToken';
@@ -47,6 +48,8 @@ export function clearApiCache(urlPrefix?: string): void {
 
 // Session tokens live in SecureStore (Keychain/Keystore-backed), not AsyncStorage, which is plain unencrypted disk storage.
 export async function getAuthToken(): Promise<string | null> {
+    // DEV-ONLY preview session; never true in release builds (see devBypass.ts).
+    if (DEV_AUTH_BYPASS) return DEV_BYPASS_TOKEN;
     const token = await SecureStore.getItemAsync(AUTH_TOKEN_KEY);
     if (token) return token;
 
@@ -61,10 +64,12 @@ export async function getAuthToken(): Promise<string | null> {
 }
 
 export async function setAuthToken(token: string): Promise<void> {
+    if (DEV_AUTH_BYPASS) return;
     await SecureStore.setItemAsync(AUTH_TOKEN_KEY, token);
 }
 
 async function getRefreshToken(): Promise<string | null> {
+    if (DEV_AUTH_BYPASS) return DEV_BYPASS_TOKEN;
     return SecureStore.getItemAsync(REFRESH_TOKEN_KEY);
 }
 
@@ -72,6 +77,7 @@ async function getRefreshToken(): Promise<string | null> {
 // stay signed in across days without re-prompting for a password — only losing it
 // (explicit sign-out, or the device/app data being wiped) should require a fresh login.
 export async function setSession(session: { access_token: string; refresh_token?: string }): Promise<void> {
+    if (DEV_AUTH_BYPASS) return;
     await SecureStore.setItemAsync(AUTH_TOKEN_KEY, session.access_token);
     if (session.refresh_token) {
         await SecureStore.setItemAsync(REFRESH_TOKEN_KEY, session.refresh_token);
@@ -79,6 +85,7 @@ export async function setSession(session: { access_token: string; refresh_token?
 }
 
 export async function removeAuthToken(): Promise<void> {
+    if (DEV_AUTH_BYPASS) return;
     await SecureStore.deleteItemAsync(AUTH_TOKEN_KEY);
     await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
     await AsyncStorage.removeItem(AUTH_TOKEN_KEY);

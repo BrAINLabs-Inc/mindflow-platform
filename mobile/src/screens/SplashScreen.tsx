@@ -12,6 +12,7 @@ import Svg, { Path, Defs, LinearGradient as SvgGradient, Stop } from 'react-nati
 import { RootStackParamList } from '../types/navigation';
 import { getPostAuthRoute } from '../lib/postAuthRoute';
 import { getAuthToken, removeAuthToken, apiFetch } from '../lib/apiClient';
+import { DEV_AUTH_BYPASS } from '../dev/devBypass';
 import { Colors } from '../constants/colors';
 
 // Pre-scaled ~512px/200px derivatives for inline rendering (52-180pt) — the 1024px
@@ -158,6 +159,14 @@ export default function SplashScreen() {
         };
 
         const validateSession = async () => {
+            // DEV-ONLY: skip login entirely in a bypassed dev preview.
+            if (DEV_AUTH_BYPASS) {
+                await AsyncStorage.multiSet([['isLoggedIn', 'true'], ['userName', 'Amaya']]);
+                const route = await getPostAuthRoute();
+                await waitForMinDuration();
+                navigation.replace(route);
+                return;
+            }
             try {
                 const isLoggedIn      = await AsyncStorage.getItem('isLoggedIn');
                 const token           = await getAuthToken();
